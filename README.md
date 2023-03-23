@@ -1,0 +1,1 @@
+# Paradigmas Día 1
