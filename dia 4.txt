@@ -1,0 +1,327 @@
+Hola, el dia de hoy (dia 4) al fin me animé para empezar el laboratorio, me pone nerviosa pero aqui vamos a pensar un rato.
+
+-Empecé el informe, por ahora está hecho en word, pero estoy viendo si lo cambio a overleaf.
+-preguntarle al profe si Dr. Racket ejecuta Scheme y si Scheme es el lenguaje
+"usando el lenguaje de programación Scheme en la resolución de un problema acotado."
+-Abrir un zip del trabajo.
+
+APUNTES IMPORTANTES PARA PONER EN EL INFORME, DESCRIPCIONES ENTRE OTROS.
+El informe actual es el informe numero 1 de las tres entregas semestrales 
+Enfocado en un simulador de sistema operativo, centrado esecificamente en un sistema de archivos simplificado y comandos que permitan operar en él
+
+se desarrollan soluciones a partir de conceptos y principios de distintos paradigmas de programación. 
+Siendo estas soluciones medios por el cual el usuario puede realizar distintas operaciones. crear, buscar, listar... 
+debe cumplir requerimientos minimos obligatorios que serán especificados mas adelante (poner seccion en el informe sobre los requerimientos)
+
+Un sistema de archivos (file system) comprende los procesos, métodos y reglas que emplea
+un sistema operativo para el almacenamiento de datos en la memoria de un computador. El
+sistema de archivos permite la organización de los archivos, seguridad y localización, entre
+otras operaciones.
+Existen distintos tipos de sistemas de archivos tales como FAT, FAT32 y NTFS.
+
+A diferencia de los sistemas de archivos antes señalados, este proyecto se concentrará en
+trabajar en la organización superficial de los archivos (con una orientación al usuario), por lo
+que aspectos relativos al almacenamiento físico (ej: clusters, fragmentación, etc.) no serán
+abordados.
+
+En términos simples, en el sistema de archivos implementado se debe permitir múltiples
+usuarios. Cada usuario puede tener acceso a una o más unidades lógicas (particiones) o
+físicas (almacenamiento HDD o SSD). En estas unidades, los usuarios pueden crear
+carpetas y subcarpetas, donde pueden almacenar archivos de cualquier tipo y de cualquier
+tamaño (Figura 1). Las unidades tendrán una capacidad de almacenamiento máxima y por
+tanto los usuarios en su conjunto tendrán un límite máximo de almacenamiento.
+
+Respecto de las carpetas, estás quedan identificadas con un nombre que es único dentro
+del nivel del árbol en que está localizado. Además, las carpetas tienen una fecha de
+creación, fecha de última modificación, usuario que la creó, usuarios con los que está
+compartida, tamaño expresado en bytes, cantidad de archivos y subcarpetas y atributos de
+seguridad (solo lectura, oculto, etc.).
+
+
+De igual forma, los archivos están identificados con un nombre que es único dentro del nivel
+del árbol donde se encuentran alojados. Los archivos tienen contenido, que para los efectos
+de este laboratorio corresponderá sólo a texto que podría representar texto plano o archivos
+binarios. Además tienen un formato (ej: jpg, png, pdf, txt, etc.), una fecha de creación, fecha
+de última modificación, usuario que lo creó, usuarios con los que está compartido, tamaño
+expresado en bytes y atributos de seguridad, entre otros.
+
+A partir de estos elementos, el sistema soporta los siguientes aspectos que serán cubiertos
+de manera parcial o completa en los laboratorios.
+1. Soporte para múltiples usuarios
+2. Soporte para múltiples unidades físicas y lógicas
+3. Permisos por archivo, carpeta y por usuario
+4. Operaciones del tipo:
+    a. Compartir (share)
+    b. Copiar (copy)
+    c. Mover (move)
+    d. Eliminar archivos (del)
+    e. Añadir archivos (addFile)
+    f. Crear carpetas y subcarpetas, también llamados directorios (md)
+    g. Eliminar carpetas (rd)
+    h. Cambiar de directorio (cd)
+    i. Renombrar (ren)
+    j. Buscar dentro del contenido de los archivos (grep)
+    k. Listar archivos con parámetros tipo /s /a (dir)
+    l. Formatear una unidad (format)
+    m. Encriptar (encrypt)
+    n. Desencriptar (decrypt)
+5. Registro de fechas de creación y última modificación de carpetas y archivos
+6. Contará con una papelera donde los elementos eliminados quedan alojados de
+forma temporal.
+7. Vaciar papelera de reciclaje
+8. Restaurar elementos de papelera de reciclaje
+
+
+NOMBRES DE ARCHIVOS.
+nombre zip:  labN_rut_ApellidoPaterno sin digito verificador
+
+IMPORTANTES:
+repositorio.txt
+autoevaluacion.txt
+
+El nombre de todos los archivos con código fuente, informes, 
+autoevaluación, etc. debe
+seguir el siguiente formato: 
+NombreArchivo_rut_Apellidos.extension 
+(ej:labDobble_12123456_PerezPeña.rkt; funciones_12123456_PerezPeña.rkt)
+
+
+ESPECIFICACIONES INFORME 
+MAX 5 PLANAS
+exculidas portada, indice, referencias en apa, anexos.
+debe tener -Intro
+            -descripcion del problema
+            -analisis del problema
+            -diseño de solucion (esquematizada y explicada brevemente)
+            -consideraciones de implemetacion - algortimos, bibliotecas
+            - Instrucciones con ejemplos claros de uso 
+            -resultados obtenidos
+            -evaluacion completa 
+            -conclusiones
+
+
+PDF LAB 2
+Es una practica para abordar el paradigma
+
+REQUERIMIENTOS OBLIGATORIOS 
+-incluir autoevaluacion
+-usar lenguaje Scheme
+-version de drracket 6.11 o mas
+-usar funciones estandar del lenguaje, no bibliotecas
+
+-Todas las funciones deben estar debidamente
+comentadas. Indicando descripción de la función, tipo de algoritmo/estrategia
+empleado (ej: fuerza bruta, backtracking, si aplica) argumentos de entrada (dominio)
+y retorno (recorrido). En caso de que la función sea recursiva, indicar el tipo de
+recursión utilizada y el porqué de esta decisión
+
+- incluir (dominio - tipo de entrada de la función) y llegada (recorrido - tipo de
+retorno de la función)
+- estructurar en archivos independientes archivo para cada TDA implementado y uno para el programa principales 
+-historial de trabajo en github 
+-Script de pruebas (pruebas_RUT_Apellidos.rkt): Incluir como parte
+de su entregable un archivo independiente al código donde muestre de forma
+completa, con la documentación correspondiente, el funcionamiento de su programa. 
+además de 3 ejemplos por cada una de las funciones requeridas.
+Solo se revisarán proyectos que incluyan este archivo.
+
+-Para cada función se establecen prerrequisitos. Estos
+deben ser cumplidos para que se proceda con la evaluación de la función
+implementada. Ej: Para evaluar la función login, debe estar implementada la función
+register
+
+
+REQUERIMIENTOS FUNCIONALES
+-Especificar e implementar abstracciones apropiadas para el
+problema. Representación, Constructores, Funciones
+de Pertenencia, Selectores, Modificadores y Otras Funciones. Procurar hacer un uso
+adecuado de esta estructura a fin de no afectar la eficiencia de sus funciones.
+
+TDA
+-TDA system - constructor. Función constructora de un sistema. Deja
+registro de la fecha de creación.
+nombre: system
+dominio:string
+recorrido: system
+
+-TDA system- run : Función que permite ejecutar un comando (función)
+sobre un sistema. Toda acción realizada con run relativa a creación de archivos,
+carpetas, renombrar, copiar, mover, eliminar, debe dejar un registro de la fecha de
+modificación, además de verificar los permisos del recurso que será alterado
+nombre:run
+dominio: system x command
+recorrido: system
+
+-TDA system - add-drive: Función que permite añadir una unidad a un
+sistema. La letra de la unidad es única.
+nombre: add-drive
+dominio: system x
+                letter(char) x name(string) x capacity(int)
+
+-TDA system - register : Función que permite registrar un nuevo usuario al
+sistema. El nombre de usuario es único y no puede ser duplicado.
+nombre: register
+dominio: system x  
+            username (string)
+recorrido: system
+
+-TDA system - login: Función que permite iniciar sesión con un usuario del
+sistema, solo si éste existe.
+nombre: login
+Dominio: system X
+        userName (String)
+recorrido: system
+
+-TDA system - logout: Función que permite cerrar la sesión de un usuario
+en el sistema.
+nombre: logout 
+dominio: system
+recorrido: system
+
+-TDA system - switch-drive:  Permite fijar la unidad en la que el usuario
+realizará acciones. La función solo debe funcionar cuando hay un usuario con sesión
+iniciada en el sistema a partir de la función descrita en 6.
+nombre: switch-drive
+dominio:system X
+        letter (char)
+recorrido: system
+
+-TDA system - md (make directory): función que permite crear directorio
+dentro de una unidad a partir del nombre especificado. Internamente la función
+añade datos relativos a usuario creador, fecha de creación, fecha de última
+modificación y atributos de seguridad como los señalados en el enunciado general
+nombre: md
+dominio: system X       
+        name (string)
+recorrido: system
+
+-TDA system- cd (change directory): función que permite cambiar la ruta
+(path) donde se realizarán operaciones. cd permite cambiarse a un directorio
+especificado a partir de la ruta señalada en un String. Además, contará con con los
+comodines especiales “/” (se usa slash en lugar de backslash ya que en racket
+backslash es un character especial)que permitirán regresar a la carpeta del nivel
+anterior siguiendo la ruta actual del usuario y volver a la raíz de la unidad
+respectivamente.
+nombre: cd
+dominio:system x
+        path or foldername string
+recorrido: system
+
+TDA system - add-file: función que permite añadir un archivo en la ruta
+actual.
+nombre:add-file
+dominio: system x file
+recorrido: system
+
+TDA system - del: función para eliminar un archivo o varios archivos en
+base a un patrón determinado. Esta versión también puede eliminar una carpeta
+completa con todos sus subdirectorios. El contenido eliminado se va a la papelera.
+
+nombre: del
+recorrido: system
+dominio:system x fileName or fileNamePattern (string)
+
+TDA system - rd (remove directory): función para eliminar una carpeta,
+siempre y cuando ésta esté vacía. Una carpeta se puede eliminar estando
+posicionado fuera de ésta.
+Nombre: rd
+Dominio: system X
+        folderName or folderPath (string)
+Recorrido: system
+
+TDA system - copy: función para copiar un archivo o carpeta desde una
+ruta origen a una ruta destino.
+Nombre: copy
+Dominio: system X
+        source (file or folder) (String) x target path (String)
+Recorrido: system
+
+TDA system - move: función para mover un archivo o carpeta desde una
+ruta origen a una ruta destino. La operación de mover elimina el contenido desde la
+ruta origen.
+Nombre: move
+Dominio: system X
+        source (file or folder) (String) x target path (String)
+Recorrido: system
+
+TDA system - ren (rename): función para renombrar una carpeta o
+archivo, siempre y cuando el nuevo nombre no viole la restricción de unidad dentro
+del mismo nivel.
+Nombre: ren
+Dominio: system X
+currentName (String) X newName (String)
+Recorrido: system
+
+TDA system - dir (directory): función para listar el contenido de un
+directorio específico o de toda una ruta, lo que se determina mediante parámetros.
+Dominio system X
+        params (Strings)
+Recorrido string (formateado para poder visualizarlo con display)
+
+TDA system - format: función para formatear una unidad dada su letra, lo
+que borra todo su contenido, además de indicar nuevo nombre, pero conservando
+capacidad.
+Nombre:format
+Dominio: system X
+        letter (char) X name (String)
+Recorrido: system
+
+
+TDA system - encrypt: función para encriptar un archivo o carpeta y todo
+su contenido (nombres de carpetas, subcarpetas, archivos y el contenido de éstos).
+La función de encriptación está dada por una función String->String. La función de
+desencriptación (decryptFn) quedará registrada en la metadata de la carpeta y su
+contenido, para una posterior desencriptación.
+Nombre: encrypt
+Dominio: system X
+        encryptFn (fn: String->String) X decryptFn (fn: String->String)
+        password (String) X folderName or Path (String)
+Recorrido: system
+
+TDA system - decrypt: función para desencriptar un archivo o carpeta y
+todo su contenido (nombres de carpetas, subcarpetas, archivos y el contenido de
+éstos)..
+Nombre: decrypt
+Dominio: system X
+        password (String) X folderName or Path (String)
+Recorrido: system
+
+TDA system - plus-one: función que transforma un String sumando al
+código ASCII de cada carácter un 1. Está función se puede usar en combinación con
+la función encrypt.
+Nombre: plus-one
+Dominio: String
+Recorrido: String
+
+TDA system - minus-one: función que transforma un String restando al
+código ASCII de cada carácter un 1. Está función se puede usar en combinación con
+la función encrypt.
+Nombre: minus-one
+Dominio: String
+Recorrido: String
+
+TDA system - grep: función que permite buscar dentro del contenido de un
+archivo específico o dentro de una ruta.
+Nombre:  grep
+Dominio: system X
+        pattern (String) X fileName or path (String)
+Recorrido: String formateado para visualizarlo con display
+
+TDA system - view-trash: función que permite obtener el contenido de la
+papelera de reciclaje de un sistema.
+Nombre : view-trash
+Dominio: system
+Recorrido: String formateado para visualizarlo con display
+
+TDA system - restore: función que restaurar contenido específico dentro
+de la papelera para ubicarlo en su ubicación original.
+Nombre: restore
+Dominio: system
+        fileName or pattern (String)
+Recorrido: String formateado para visualizarlo con display
+
+
+FIIIIN
+
+
+
