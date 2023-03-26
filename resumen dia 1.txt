@@ -2,6 +2,7 @@ Ya me calmé, entonces mis descubrimientos son:
 -para crear un nuevo archivo que se suba a github debo ir a la carpeta que cree paradigmas dia 1 y crear un archivo de texto
 -con el archivo creado debo volver a gitkraken y editarlo, va a salir algo como WIP arriba
 -despues de editarlo poner save stage, a la fuerza nomas porque si pongo el otro no sé que pasa
+-recordar poner mensaje sino no te deja guardar oooh
 -despues push o pull, alguno debe funcionar (push, ya pregunté)
 -despues ir a github y rezar para que aparezca
 
@@ -16,3 +17,5 @@ hOLA, probando los commits.
 Los tutoriales que vi en youtube no me sirvieron de nada, espero que esto sea un commit. 
 no sé que habia que escribir, pero no sé 
 ahora pensé en un nombre mejor para esto pero no entiendo como cambiarle el titulo
+
+Mi conclusión es que un commit es algo completamente distinto a lo que pensaba.
