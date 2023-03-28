@@ -5,27 +5,36 @@
 Función constructora de un sistema. Deja registro de la fecha de creación.
 
           --- CONSTRUCTOR ---
-DOMINIO: recibe un string, que supongo será el nombre del nuevo sistema
-RECORRIDO: regresa un system 
+DOMINIO: string
+RECORRIDO: system (conformado por nombre sistema, drive y usuario/s)
 DESCRIPCION: se ingresa un string en la funcion devolviendo un system
-             que se identifica con el string ingresado
+             conformado por una lista de elementos que complementan el system
 USO DE RECURSION: no se usa.
+
+debe tener el nombre system y funcionar con las cosas del doc
 
 probablemente se usa el TDA FECHA
 |#
 
-;(lambda (fecha) (list fecha))
-;(define (nuevo string)
-; (lambda (fecha)
-;    (lambda (fecha) (list fecha))))
-;en este intenté usar calculo lambda pero no corresponde
-;con el script pq hay que entregarle dos cosas
+;(define (system string) 
+ ; (list string 16042023))
 
-(define (system string) 
-  (list string 16042023))
-;en este recibe solo el nombre y coloca una fecha predeterminada en el codigo
-; para que funcione: (system "hola")
-
-;(define (system . string) string)
+(define (system string)
+  (make-system string null null))  ;el primer elemento es el nombre, siguiente drive, sig usuario
 
 
+(define (make-system nombre drive usuario)
+  (list nombre drive usuario))
+
+
+
+
+(define S0 (system "newSystem"))
+(define S1 (make-system "newSystem" "ewe" "ISIDORA"))
+S1
+S0
+
+
+(define S1 ((run S0 add-drive) #\C "SO" 1000))
+(define S2 ((run S1 add-drive) #\C "SO1" 3000))
+(define S3 ((run S2 add-drive) #\D "Util" 2000))
