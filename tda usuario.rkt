@@ -35,7 +35,7 @@ recorrido: boolean
 (define user0 (register "isi")) ;prueba del registro
 (is-user? user0) ;prueba de si es user
 
-(define user1 (register "thomi"))
+(define user1 (register "Dominic"))
 (is-user? user1)
 
 
