@@ -22,19 +22,20 @@ ideas: se necesitan las funciones creadas en tda system(nombre temporal) para po
 (define add-user
   (lambda(system)
     (lambda (string)
-      (if(member string (map car(get-system-usuarios system))) ;buen
-         ((display "ya existe el usuario")(display string)system) ;if
+      (if(member string (map get-usuarios(get-system-usuarios system))) ;buen
+         (display "ya existe el usuario") ;if
          (make-system(get-system-name system);else
                      (get-system-drive system)
-                     (cons(make-user string)(get-system-usuarios system)))))))
+                     (cons(make-user string)(get-system-usuarios system))))))) ;no me guarda los otros usuarios
            
 
-#|FUNCION PARA VERIFICAR SI EL USUARIO SE REGISTRÓ
+#|FUNCION PARA VERIFICAR SI ES USUARIO
 Pertenencia: verifica si el usuario ya existia o no
 DESCRIPCION DE LA FUNCION: funcion ligada a la no duplicidad de nombres de usuario
 dominio: lista
 recorrido: boolean
 recursion: no
+la verdad no me sirve mucho, pero la dejo por si acaso
 |#
 
 (define (is-user? user)
@@ -44,21 +45,42 @@ recursion: no
         #f) ;else
      #f))
 
+#|FUNCION LOGIN
+DOMINIO:system X userName (String)
+RECORRIDO: system
+RECURSION: 
+DESCRIPCION: Función que permite iniciar sesión con un usuario del sistema, solo si éste existe.
+|#
+
+#|(define login
+  (lambda(system)
+    (lambda (string)
+      (|#
+      
 
 
 
-
-
-(define S4 ((run S3 add-user) "user1"))
+(define S4 ((run S3 add-user) "user1")) ;guarda 1
 S4
-(define S5 ((run S3 add-user) "user1"))
+(define S5 ((run S4 add-user) "user1")) ;regresa mensaje
 ;(is-user? S4)
 S5
-(define S6 ((run S3 add-user) "user2"))
+(define S6 ((run S4 add-user) "user2")) ;guarda 2
 S6
+(define S7 ((run S6 add-user) "user3")) ;guarda 3, con S5 no funciona, S6 si, S3 tambien pero solo guarda user3
+S7
+(define S8 ((run S7 add-user) "user3"))
+S8
+;S5 NO FUNCIONA POR ALGUNA RAZON
+
+
+
 
 ;(map string? S4);para saber si hay un string en la lista
 ;(map string? (car(car(reverse S4)))); para saber si hay string en la lista usuarios
 ;(member "user1" (map car(car(reverse S4)))) ;verifica si en la lista está cierto usuario
 
-
+;iniciando sesión con usuarios. Incluye caso S8 que intenta iniciar sesión con user2 sin antes haber salido con user1
+;(define S7 ((run S6 login) "user1"))
+;(define S8 ((run S7 login) "user2"))
+;(define S8 ((run S7 login) "user1"))

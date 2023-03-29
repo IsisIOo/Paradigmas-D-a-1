@@ -58,11 +58,13 @@ RECURSION: no
                     
 (define add-drive
   (lambda(system)
-    (lambda (letter name capacity) ;info del drive
-      (make-system (get-system-name system)
-                   (cons(make-drive letter name capacity) ;;make-drive= lista que recibe 3 cosas, y le agrega algo adelante de 3 cosas
-                        (get-system-drive system)) ;cadr de la lista system, system =lista
-      (get-system-usuarios system)))))
+    (lambda (letter name capacity);info del drive
+      (if(member letter (map car(get-system-drive system)))
+         (display "ya existe una drive con esa letra")
+         (make-system (get-system-name system)
+                      (cons(make-drive letter name capacity) ;;make-drive= lista que recibe 3 cosas, y le agrega algo adelante de 3 cosas
+                      (get-system-drive system)) ;cadr de la lista system, system =lista
+                      (get-system-usuarios system))))))
 
 
 
@@ -73,14 +75,14 @@ RECURSION: no
 
 ;ejemplos
 (define S0 (system "newSystem"))
-
-;S1
-;S0
+S0
 
 (define S1 ((run S0 add-drive) #\C "SO1" 3000))
 (define S2 ((run S1 add-drive) #\C "SO1" 3000))
 (define S3 ((run S2 add-drive) #\D "Util" 2000))
+(define S4 ((run S4 add-drive) #\E "INutil" 2000))
+S1
 
-
-
+;S2
+S3
 (provide (all-defined-out)) ;es para que las funciones de aqui se usen en otros
