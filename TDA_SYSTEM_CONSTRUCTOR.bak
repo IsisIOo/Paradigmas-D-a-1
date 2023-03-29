@@ -38,6 +38,10 @@ modificación, además de verificar los permisos del recurso que será alterado|
 (define (run system command) ;se aplica una funcion en la lista system por ejemplo add-rive
   (command system))
 
+#|Otras funciones necesarias|#
+(define get-system-name car)
+(define get-system-drive cadr)
+(define get-system-usuarios caddr)
 
 #|FUNCION ADD-DRIVE seguro hay que cambiarlo a otro archivo
 DOMINIO: system x/dominio del primer lambda
@@ -45,7 +49,20 @@ DOMINIO: system x/dominio del primer lambda
 RECORRIDO: system
 DESCRIPCION: Función que permite añadir una unidad a un
 sistema. La letra de la unidad es única.
+RECURSION: no
+
 |#
+
+(define (make-drive letter name capacity)
+  (list letter name capacity))
+                    
+(define add-drive
+  (lambda(system)
+    (lambda (letter name capacity) ;info del drive
+      (make-system (get-system-name system)
+                   (cons(make-drive letter name capacity) ;;make-drive= lista que recibe 3 cosas, y le agrega algo adelante de 3 cosas
+                        (get-system-drive system)) ;cadr de la lista system, system =lista
+      (get-system-usuarios system)))))
 
 
 
@@ -56,11 +73,11 @@ sistema. La letra de la unidad es única.
 
 ;ejemplos
 (define S0 (system "newSystem"))
-(define S1 (make-system "newSystem" "ewe" "ISIDORA"))
-S1
+;(define S1 (make-system "newSystem" "ewe" "ISIDORA"))
+;S1
 S0
 
 
-(define S2 ((run S0 add-drive) #\C "SO" 1000))
-(define S3 ((run S1 add-drive) #\C "SO1" 3000))
-(define S4 ((run S2 add-drive) #\D "Util" 2000))
+;(define S0 ((run S0 add-drive) #\C "SO" 1000))
+(define S1 ((run S0 add-drive) #\C "SO1" 3000))
+S1
