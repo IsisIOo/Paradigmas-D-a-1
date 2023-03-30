@@ -23,7 +23,7 @@ ideas: se necesitan las funciones creadas en tda system(nombre temporal) para po
   (lambda(system)
     (lambda (string)
       (if(member string (map get-usuarios(get-system-usuarios system))) ;buen
-         (display "ya existe el usuario") ;if
+         (display "ya existe el usuario \n") ;if
          (make-system(get-system-name system);else
                      (get-system-drive system)
                      (cons(make-user string)(get-system-usuarios system))))))) ;no me guarda los otros usuarios
@@ -35,15 +35,31 @@ DESCRIPCION DE LA FUNCION: funcion ligada a la no duplicidad de nombres de usuar
 dominio: lista
 recorrido: boolean
 recursion: no
-la verdad no me sirve mucho, pero la dejo por si acaso
+la verdad no me sirve mucho, pero la dejo por si acaso AHORA SI SIRVE SLDKSÑDFLK
 |#
+
 
 (define (is-user? user)
   (if(list? user) ;pregunta si user es lista, en este caso s4 lo es
      (if(string?(car(car(car(reverse user)))))
-        #t   ;if
-        #f) ;else
-     #f))
+        (cons #t (car(car(car(reverse user)))))  ;if
+        (cons #f (car(car(car(reverse user))))));else
+     (display "el usuario no existe o no se pudo crear\n"))) ;referente a que se copió el nombre de otro usuario
+
+
+#|(define (make-lista-u string)
+  (list string))
+
+(define (make-user1 string bool) ;se supone que crea el usuario
+  (list string bool))
+
+(define prueba
+  (lambda(system)
+    (lambda (string)
+      (if(member string (map get-usuarios(get-system-usuarios system))) ;buen
+         (display "ya existe el usuario \n")
+         (make-lista-u(cons(make-user1 string #f)(get-system-usuarios system)))))))|#
+
 
 #|FUNCION LOGIN
 DOMINIO:system X userName (String)
@@ -58,12 +74,33 @@ DESCRIPCION: Función que permite iniciar sesión con un usuario del sistema, so
       (|#
       
 
-
-
 (define S4 ((run S3 add-user) "user1")) ;guarda 1
 S4
+
+(define S5 ((run S4 add-user) "user2")) ;regresa mensaje
+S5
+
+(define S6 ((run S5 add-user) "user1"))
+S6
+
+
+#|(define S4 ((run S3 add-user) "user1")) ;guarda 1
+S4
+
+(define S5 ((run S4 add-user) "user2")) ;regresa mensaje
+S5
+
+(define S6 ((run S5 add-user) "user1"))
+S6
+SCRIPTS ORIGINALES|#
+
+(is-user? S4)
+;(is-user? S5)
+
+#|(define S4 ((run S3 add-user) "user1")) ;guarda 1
+S4
 (define S5 ((run S4 add-user) "user1")) ;regresa mensaje
-;(is-user? S4)
+(is-user? S4)
 S5
 (define S6 ((run S4 add-user) "user2")) ;guarda 2
 S6
@@ -71,7 +108,7 @@ S6
 S7
 (define S8 ((run S7 add-user) "user3"))
 S8
-;S5 NO FUNCIONA POR ALGUNA RAZON
+;S5 NO FUNCIONA POR ALGUNA RAZON|#
 
 
 
