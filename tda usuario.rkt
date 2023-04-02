@@ -13,9 +13,14 @@ RECURSION: NO
 ideas: se necesitan las funciones creadas en tda system(nombre temporal) para poder registrar un usuario en lista usuarios
 |#
 
-(define (make-user string) ;se supone que crea el usuario
-  (list string))   
+(define (make-user string);se supone que crea el usuario
+  (if(is-string string)
+     (list string)
+     (display "no se creará el usuario\n"))) ;revisa si es string
 
+
+
+;capa selectora
 (define get-usuarios car);obtener usuarios
 
 
@@ -26,9 +31,15 @@ ideas: se necesitan las funciones creadas en tda system(nombre temporal) para po
          (display "ya existe el usuario \n") ;if
          (make-system(get-system-name system);else
                      (get-system-drive system)
-                     (cons(make-user string)(get-system-usuarios system))))))) ;no me guarda los otros usuarios
+                     (cons(make-user string)(get-system-usuarios system))
+                     (get-system-usuario-conectado system)))))) ;no me guarda los otros usuarios
            
 
+
+;capa de pertenencia verifica si está el usuario en lista de usuarios
+(define (comprobar string system)
+  (member string (map get-usuarios(get-system-usuarios system))))
+     
 #|FUNCION PARA VERIFICAR SI ES USUARIO
 Pertenencia: verifica si el usuario ya existia o no
 DESCRIPCION DE LA FUNCION: funcion ligada a la no duplicidad de nombres de usuario
@@ -36,8 +47,6 @@ dominio: lista
 recorrido: boolean
 recursion: no
 la verdad no me sirve mucho, pero la dejo por si acaso AHORA SI SIRVE SLDKSÑDFLK
-|#
-
 
 (define (is-user? user)
   (if(list? user) ;pregunta si user es lista, en este caso s4 lo es
@@ -45,33 +54,36 @@ la verdad no me sirve mucho, pero la dejo por si acaso AHORA SI SIRVE SLDKSÑDFL
         (cons #t (car(car(car(reverse user)))))  ;if
         (cons #f (car(car(car(reverse user))))));else
      (display "el usuario no existe o no se pudo crear\n"))) ;referente a que se copió el nombre de otro usuario
+|#
+
+;capa constructora
+;(define (lista-users system)
+  
 
 
-#|(define (make-lista-u string)
-  (list string))
 
-(define (make-user1 string bool) ;se supone que crea el usuario
-  (list string bool))
 
-(define prueba
-  (lambda(system)
-    (lambda (string)
-      (if(member string (map get-usuarios(get-system-usuarios system))) ;buen
-         (display "ya existe el usuario \n")
-         (make-lista-u(cons(make-user1 string #f)(get-system-usuarios system)))))))|#
+
 
 
 #|FUNCION LOGIN
 DOMINIO:system X userName (String)
 RECORRIDO: system
 RECURSION: 
-DESCRIPCION: Función que permite iniciar sesión con un usuario del sistema, solo si éste existe.
-|#
+DESCRIPCION: Función que permite iniciar sesión con un usuario del sistema, solo si éste existe.|#
+
+
+;capa constructura
+;(define (status-user string)
+
+ 
 
 #|(define login
   (lambda(system)
     (lambda (string)
-      (|#
+      (if (comprobar string system)|#
+          
+      
       
 
 (define S4 ((run S3 add-user) "user1")) ;guarda 1
@@ -94,7 +106,7 @@ S5
 S6
 SCRIPTS ORIGINALES|#
 
-(is-user? S4)
+;(is-user? S4)
 ;(is-user? S5)
 
 #|(define S4 ((run S3 add-user) "user1")) ;guarda 1

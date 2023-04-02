@@ -1,5 +1,7 @@
 #lang racket
 ;Isidora Oyanedel
+;profesor: Gonzalo Martinez
+;
 #|TDA System - CONSTRUCTOR
 -----------descripcion del TDA--------------
 Función constructora de un sistema. Deja registro de la fecha de creación.
@@ -20,11 +22,21 @@ probablemente se usa el TDA FECHA
  ; (list string 16042023))
 
 (define (system string)
-  (make-system string null null))  ;el primer elemento es el nombre, siguiente drive, sig usuario
+  (if(is-string string)
+     (make-system string null null null) ;el primer elemento es el nombre, siguiente drive, sig usuario
+     (display "no se creará el sistema")))    ;por mientras así, no creará el sistema si es numeros
 
 
-(define (make-system nombre drive usuario)
-  (list nombre drive usuario))
+
+;-capa constructora-
+(define (make-system nombre drive usuario usuario-conectado)
+  (list nombre drive usuario usuario-conectado))
+
+;-capa pertenencia-
+(define (is-string string)
+  (if(string? string)
+     (display "se ha creado el sistema\n")
+     #f))
 
 #|FUNCION RUN
 
@@ -38,12 +50,14 @@ modificación, además de verificar los permisos del recurso que será alterado|
 (define (run system command) ;se aplica una funcion en la lista system por ejemplo add-rive
   (command system))
 
-#|Otras funciones necesarias|#
+#|Otras funciones necesarias capa selectora|#
 (define get-system-name car)
 (define get-system-drive cadr)
 (define get-system-usuarios caddr)
+(define get-system-usuario-conectado cadddr)
 
-#|FUNCION ADD-DRIVE seguro hay que cambiarlo a otro archivo
+
+#|FUNCION ADD-DRIVE
 DOMINIO: system x/dominio del primer lambda
          letter(char) x name(string) x capacity(int) /este se refiere a el dominio de la currificacion
 RECORRIDO: system
@@ -53,9 +67,10 @@ RECURSION: no
 
 |#
 
+;capa constructora
 (define (make-drive letter name capacity)
   (list letter name capacity))
-                    
+
 (define add-drive
   (lambda(system)
     (lambda (letter name capacity);info del drive
@@ -64,7 +79,8 @@ RECURSION: no
          (make-system (get-system-name system)
                       (cons(make-drive letter name capacity) ;;make-drive= lista que recibe 3 cosas, y le agrega algo adelante de 3 cosas
                       (get-system-drive system)) ;cadr de la lista system, system =lista
-                      (get-system-usuarios system))))))
+                      (get-system-usuarios system)
+                      (get-system-usuario-conectado system))))))
 
 
 
@@ -74,7 +90,8 @@ RECURSION: no
 
 
 ;ejemplos
-(define S0 (system "newSystem"))
+;(define S100 (system 123)) ;ejemplo donde no arranca un int
+(define S0 (system "NewSystem"))
 S0
 
 (define S1 ((run S0 add-drive) #\C "SO1" 3000))
