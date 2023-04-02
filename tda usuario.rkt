@@ -92,8 +92,8 @@ DESCRIPCION: Función que permite cerrar la sesión de un usuario en el sistema.
       (make-system(get-system-name system);verdadero
                   (get-system-drive system)
                   (get-system-usuarios system)
-                  '())
-      (display "no hay usuario conectado")))
+                  '()) ;asigna lista vacia a los usuarios logeados
+      (display "no hay usuario conectado para deslogear\n")))
 
 
 
