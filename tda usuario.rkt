@@ -34,8 +34,6 @@ ideas: se necesitan las funciones creadas en tda system(nombre temporal) para po
                      (cons(make-user string)(get-system-usuarios system))
                      (get-system-usuario-conectado system)))))) ;no me guarda los otros usuarios
            
-
-
 ;capa de pertenencia verifica si está el usuario en lista de usuarios
 (define (comprobar string system)
   (member string (map get-usuarios(get-system-usuarios system))))
@@ -56,16 +54,7 @@ la verdad no me sirve mucho, pero la dejo por si acaso AHORA SI SIRVE SLDKSÑDFL
      (display "el usuario no existe o no se pudo crear\n"))) ;referente a que se copió el nombre de otro usuario
 |#
 
-;capa constructora
-;(define (lista-users system)
   
-
-
-
-
-
-
-
 #|FUNCION LOGIN
 DOMINIO:system X userName (String)
 RECORRIDO: system
@@ -74,26 +63,51 @@ DESCRIPCION: Función que permite iniciar sesión con un usuario del sistema, so
 
 
 ;capa constructura
-;(define (status-user string)
+(define (status-user string)
+  (if(is-string string)
+     (list string)
+     (display "no se puede iniciar sesion\n")))
 
- 
-
-#|(define login
+(define login
   (lambda(system)
     (lambda (string)
-      (if (comprobar string system)|#
-          
-      
+      (if (null? (get-system-usuario-conectado system))
+          (if (comprobar string system);verdadero
+              (make-system(get-system-name system);verdadero
+                          (get-system-drive system)
+                          (get-system-usuarios system)
+                          (cons(status-user string)(get-system-usuario-conectado system)))
+              (display "no se puede iniciar sesion, el usuario no existe\n")) ;falso
+          (display "ya hay un usuario conectado\n"))))) ;falso
+
+#|FUNCION LOGOUT
+DOMINIO:system X userName (String)
+RECORRIDO: system
+RECURSION: 
+DESCRIPCION: Función que permite iniciar sesión con un usuario del sistema, solo si éste existe.
+|#        
+
+
+
+
+
+
       
 
 (define S4 ((run S3 add-user) "user1")) ;guarda 1
 S4
 
-(define S5 ((run S4 add-user) "user2")) ;regresa mensaje
-S5
-
-(define S6 ((run S5 add-user) "user1"))
+(define S6 ((run S4 add-user) "user2")) ;regresa mensaje
 S6
+
+;(define S6 ((run S5 add-user) "user1"))
+;S6
+
+(define S7 ((run S6 login) "user1"))
+S7
+(define S8 ((run S7 login) "user2"))
+S8
+
 
 
 #|(define S4 ((run S3 add-user) "user1")) ;guarda 1
