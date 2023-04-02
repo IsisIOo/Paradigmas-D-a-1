@@ -81,13 +81,19 @@ DESCRIPCION: Función que permite iniciar sesión con un usuario del sistema, so
           (display "ya hay un usuario conectado\n"))))) ;falso
 
 #|FUNCION LOGOUT
-DOMINIO:system X userName (String)
+DOMINIO:system 
 RECORRIDO: system
-RECURSION: 
-DESCRIPCION: Función que permite iniciar sesión con un usuario del sistema, solo si éste existe.
+RECURSION: no
+DESCRIPCION: Función que permite cerrar la sesión de un usuario en el sistema.
 |#        
 
-
+(define (logout system)
+  (if (not(null?(get-system-usuario-conectado system)))
+      (make-system(get-system-name system);verdadero
+                  (get-system-drive system)
+                  (get-system-usuarios system)
+                  '())
+      (display "no hay usuario conectado")))
 
 
 
@@ -105,10 +111,11 @@ S6
 
 (define S7 ((run S6 login) "user1"))
 S7
-(define S8 ((run S7 login) "user2"))
-S8
+;(define S8 ((run S7 login) "user2"))
+;S8
 
-
+(define S9 (run S7 logout))
+S9
 
 #|(define S4 ((run S3 add-user) "user1")) ;guarda 1
 S4
