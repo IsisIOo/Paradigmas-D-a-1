@@ -23,19 +23,25 @@ probablemente se usa el TDA FECHA
 
 (define (system string)
   (if(is-string string)
-     (make-system string null null null) ;el primer elemento es el nombre, siguiente drive, sig usuario
+     (make-system string null null null null current-seconds) ;el primer elemento es el nombre, siguiente drive, sig usuario
      (display "no se creará el sistema")))    ;por mientras así, no creará el sistema si es numeros
 
 
 
 ;-capa constructora-
-(define (make-system nombre drive usuario usuario-conectado)
-  (list nombre drive usuario usuario-conectado))
+(define (make-system nombre drive usuario usuario-conectado drive-solicitado tiempo)
+  (list nombre drive usuario usuario-conectado drive-solicitado tiempo))
 
 ;-capa pertenencia-
 (define (is-string string)
   (if(string? string)
-     (display "se ha creado el sistema\n")
+     #t ;"se ha creado el sistema\n"
+     #f))
+
+;capa pertenencia
+(define (is-char letter)
+  (if(char? letter)
+     #t ;"se ha creado el sistema\n"
      #f))
 
 #|FUNCION RUN
@@ -50,11 +56,16 @@ modificación, además de verificar los permisos del recurso que será alterado|
 (define (run system command) ;se aplica una funcion en la lista system por ejemplo add-rive
   (command system))
 
-#|Otras funciones necesarias capa selectora|#
+#|Otras funciones necesarias, capa selectora|#
 (define get-system-name car)
 (define get-system-drive cadr)
 (define get-system-usuarios caddr)
 (define get-system-usuario-conectado cadddr)
+;modificadora
+(define
+  (get-system-drive-seleccionado system)
+  (car (reverse system)))
+
 
 
 #|FUNCION ADD-DRIVE
@@ -67,7 +78,7 @@ RECURSION: no
 
 |#
 
-;capa constructora
+;capa constructora crea la estructura drive
 (define (make-drive letter name capacity)
   (list letter name capacity))
 
@@ -80,14 +91,35 @@ RECURSION: no
                       (cons(make-drive letter name capacity) ;;make-drive= lista que recibe 3 cosas, y le agrega algo adelante de 3 cosas
                       (get-system-drive system)) ;cadr de la lista system, system =lista
                       (get-system-usuarios system)
-                      (get-system-usuario-conectado system))))))
+                      (get-system-usuario-conectado system)
+                      (reverse (get-system-usuarios system))
+                      (current-seconds))))))
 
 
 
+#|FUNCION SWITCH DRIVE
+DOMINIO:system X letter (char)
+RECORRIDO: system
+DESCRIPCION: Permite fijar la unidad en la que el usuario
+realizará acciones. La función solo debe funcionar cuando hay un usuario con sesión
+iniciada en el sistema
+RECURSION: no sé|#
 
+(define switch-drive
+  (lambda(system)
+    (lambda(letter)
+      (if(and(is-char letter)(member letter (map car(get-system-drive system)))) ;no necesito que la letra sea un string
+         (make-system (get-system-name system)
+                      (get-system-drive system) ;cadr de la lista system, system =lista
+                      (get-system-usuarios system)
+                      (get-system-usuario-conectado system)
+                      (cons letter(reverse (get-system-usuarios system)))
+                      (current-seconds))
+                      (display "No se puede seleccionar ese drive porque no existe\n"))))) ;se supone que si no existe la letra en la lista no puede iniciar nada
+;pero creo que falta que agregar que debe haber tambien un usuario iniciado, componer esa funciones.
 
-
-
+;capa pertenencia verificar si letter es char
+         
 
 ;ejemplos
 ;(define S100 (system 123)) ;ejemplo donde no arranca un int
@@ -95,11 +127,16 @@ RECURSION: no
 S0
 
 (define S1 ((run S0 add-drive) #\C "SO1" 3000))
-(define S2 ((run S1 add-drive) #\C "SO1" 3000))
+(define S2 ((run S1 add-drive) #\C "SO1" 4000))
 (define S3 ((run S1 add-drive) #\D "Util" 2000))
 ;(define S4 ((run S3 add-drive) #\E "INutil" 2000))
 S1
-S2
+S3
+
+
+(define S12 ((run S3 switch-drive) #\C))
+S12
+
 ;S3; chinga en S3, por alguna razon no funciona en los estados que ya me envío un mensaje
 
-(provide (all-defined-out)) ;es para que las funciones de aqui se usen en otros
+(provide (all-defined-out))
