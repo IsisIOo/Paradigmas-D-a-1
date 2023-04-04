@@ -33,7 +33,7 @@ ideas: se necesitan las funciones creadas en tda system(nombre temporal) para po
                      (get-system-drive system)
                      (cons(make-user string)(get-system-usuarios system))
                      (get-system-usuario-conectado system)
-                     '()))))) ;no me guarda los otros usuarios
+                     (get-system-drive-seleccionado system)))))) ;no me guarda los otros usuarios
            
 ;capa de pertenencia verifica si está el usuario en lista de usuarios
 (define (comprobar string system)
@@ -78,7 +78,7 @@ DESCRIPCION: Función que permite iniciar sesión con un usuario del sistema, so
                           (get-system-drive system)
                           (get-system-usuarios system)
                           (cons(status-user string)(get-system-usuario-conectado system))
-                          '())
+                          (get-system-drive-seleccionado system))
               (display "no se puede iniciar sesion, el usuario no existe\n")) ;falso
           (display "ya hay un usuario conectado\n"))))) ;falso
 
@@ -95,7 +95,7 @@ DESCRIPCION: Función que permite cerrar la sesión de un usuario en el sistema.
                   (get-system-drive system)
                   (get-system-usuarios system)
                   '();asigna lista vacia a los usuarios logeados
-                  '());asigna lista vacia a drive seleccionado
+                  (get-system-drive-seleccionado system));asigna lista vacia a drive seleccionado
       (display "no hay usuario conectado para deslogear\n")))
 
 

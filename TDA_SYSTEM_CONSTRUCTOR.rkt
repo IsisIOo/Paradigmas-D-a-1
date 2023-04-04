@@ -23,14 +23,14 @@ probablemente se usa el TDA FECHA
 
 (define (system string)
   (if(is-string string)
-     (make-system string null null null null current-seconds) ;el primer elemento es el nombre, siguiente drive, sig usuario
+     (make-system string null null null null) ;el primer elemento es el nombre, siguiente drive, sig usuario
      (display "no se creará el sistema")))    ;por mientras así, no creará el sistema si es numeros
 
 
 
 ;-capa constructora-
-(define (make-system nombre drive usuario usuario-conectado drive-solicitado tiempo)
-  (list nombre drive usuario usuario-conectado drive-solicitado tiempo))
+(define (make-system nombre drive usuario usuario-conectado drive-solicitado)
+  (list nombre drive usuario usuario-conectado drive-solicitado (current-seconds)))
 
 ;-capa pertenencia-
 (define (is-string string)
@@ -64,7 +64,7 @@ modificación, además de verificar los permisos del recurso que será alterado|
 ;modificadora
 (define
   (get-system-drive-seleccionado system)
-  (car (reverse system)))
+  (cadr (reverse system))) ;se corre una posicion porque ahora el ultimo no es el tiempo
 
 
 
@@ -92,8 +92,7 @@ RECURSION: no
                       (get-system-drive system)) ;cadr de la lista system, system =lista
                       (get-system-usuarios system)
                       (get-system-usuario-conectado system)
-                      (reverse (get-system-usuarios system))
-                      (current-seconds))))))
+                      (get-system-drive-seleccionado system))))))
 
 
 
@@ -113,8 +112,7 @@ RECURSION: no sé|#
                       (get-system-drive system) ;cadr de la lista system, system =lista
                       (get-system-usuarios system)
                       (get-system-usuario-conectado system)
-                      (cons letter(reverse (get-system-usuarios system)))
-                      (current-seconds))
+                      (cons letter(get-system-drive-seleccionado system)))
                       (display "No se puede seleccionar ese drive porque no existe\n"))))) ;se supone que si no existe la letra en la lista no puede iniciar nada
 ;pero creo que falta que agregar que debe haber tambien un usuario iniciado, componer esa funciones.
 
