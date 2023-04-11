@@ -24,7 +24,7 @@ ideas: se necesitan las funciones creadas en tda system(nombre temporal) para po
 (define get-usuarios car);obtener usuarios
 
 
-(define add-user
+(define register
   (lambda(system)
     (lambda (string)
       (if(member string (map get-usuarios(get-system-usuarios system))) ;buen
@@ -33,7 +33,8 @@ ideas: se necesitan las funciones creadas en tda system(nombre temporal) para po
                      (get-system-drive system)
                      (cons(make-user string)(get-system-usuarios system))
                      (get-system-usuario-conectado system)
-                     (get-system-drive-seleccionado system)))))) ;no me guarda los otros usuarios
+                     (get-system-drive-seleccionado system)
+                     (get-system-ruta system)))))) ;no me guarda los otros usuarios
            
 ;capa de pertenencia verifica si está el usuario en lista de usuarios
 (define (comprobar string system)
@@ -78,7 +79,8 @@ DESCRIPCION: Función que permite iniciar sesión con un usuario del sistema, so
                           (get-system-drive system)
                           (get-system-usuarios system)
                           (cons(status-user string)(get-system-usuario-conectado system))
-                          (get-system-drive-seleccionado system))
+                          (get-system-drive-seleccionado system)
+                          (get-system-ruta system))
               (display "no se puede iniciar sesion, el usuario no existe\n")) ;falso
           (display "ya hay un usuario conectado\n"))))) ;falso
 
@@ -95,58 +97,29 @@ DESCRIPCION: Función que permite cerrar la sesión de un usuario en el sistema.
                   (get-system-drive system)
                   (get-system-usuarios system)
                   '();asigna lista vacia a los usuarios logeados
-                  (get-system-drive-seleccionado system));asigna lista vacia a drive seleccionado
+                  (get-system-drive-seleccionado system)
+                  (get-system-ruta system));asigna lista vacia a drive seleccionado
       (display "no hay usuario conectado para deslogear\n")))
 
 
 
 
-      
-
-(define S4 ((run S3 add-user) "user1")) ;guarda 1
+;SCRIPTS
+(define S4 ((run S2 register) "user1"))
+;(define S5 ((run S4 register) "user1"))
+(define S5 ((run S4 register) "user2"))
 S4
-
-(define S6 ((run S4 add-user) "user2")) ;regresa mensaje
-S6
-
-;(define S6 ((run S5 add-user) "user1"))
+S5
 ;S6
 
-(define S7 ((run S6 login) "user1"))
-S7
-;(define S8 ((run S7 login) "user2"))
-;S8
-
-(define S9 (run S7 logout))
-S9
-
-#|(define S4 ((run S3 add-user) "user1")) ;guarda 1
-S4
-
-(define S5 ((run S4 add-user) "user2")) ;regresa mensaje
-S5
-
-(define S6 ((run S5 add-user) "user1"))
-S6
-SCRIPTS ORIGINALES|#
-
-;(is-user? S4)
-;(is-user? S5)
-
-#|(define S4 ((run S3 add-user) "user1")) ;guarda 1
-S4
-(define S5 ((run S4 add-user) "user1")) ;regresa mensaje
-(is-user? S4)
-S5
-(define S6 ((run S4 add-user) "user2")) ;guarda 2
-S6
-(define S7 ((run S6 add-user) "user3")) ;guarda 3, con S5 no funciona, S6 si, S3 tambien pero solo guarda user3
-S7
-(define S8 ((run S7 add-user) "user3"))
+;(define S7 ((run S5 login) "user1"))
+(define S8 ((run S5 login) "user2"))
+;S7
 S8
-;S5 NO FUNCIONA POR ALGUNA RAZON|#
-
-
+(define S9 (run S8 logout))
+(define S10 ((run S9 login) "user2"))
+S9
+S10
 
 
 ;(map string? S4);para saber si hay un string en la lista

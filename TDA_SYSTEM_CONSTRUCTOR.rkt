@@ -23,14 +23,14 @@ probablemente se usa el TDA FECHA
 
 (define (system string)
   (if(is-string string)
-     (make-system string null null null null) ;el primer elemento es el nombre, siguiente drive, sig usuario
+     (make-system string null null null null null) ;el primer elemento es el nombre, siguiente drive, sig usuario
      (display "no se creará el sistema")))    ;por mientras así, no creará el sistema si es numeros
 
 
 
 ;-capa constructora-
-(define (make-system nombre drive usuario usuario-conectado drive-solicitado)
-  (list nombre drive usuario usuario-conectado drive-solicitado (current-seconds)))
+(define (make-system nombre drive usuario usuario-conectado drive-solicitado rutaa)
+  (list nombre drive usuario usuario-conectado drive-solicitado rutaa (current-seconds)))
 
 ;-capa pertenencia-
 (define (is-string string)
@@ -61,12 +61,13 @@ modificación, además de verificar los permisos del recurso que será alterado|
 (define get-system-drive cadr)
 (define get-system-usuarios caddr)
 (define get-system-usuario-conectado cadddr)
+
 ;modificadora
-(define
-  (get-system-drive-seleccionado system)
-  (cadr (reverse system))) ;se corre una posicion porque ahora el ultimo no es el tiempo
+(define(get-system-drive-seleccionado system)
+  (caddr (reverse system))) ;se corre una posicion porque ahora el ultimo no es el tiempo
 
-
+(define(get-system-ruta system)
+  (cadr (reverse system)))
 
 #|FUNCION ADD-DRIVE
 DOMINIO: system x/dominio del primer lambda
@@ -92,7 +93,8 @@ RECURSION: no
                       (get-system-drive system)) ;cadr de la lista system, system =lista
                       (get-system-usuarios system)
                       (get-system-usuario-conectado system)
-                      (get-system-drive-seleccionado system))))))
+                      (get-system-drive-seleccionado system)
+                      (get-system-ruta system))))))
 
 
 
@@ -112,7 +114,8 @@ RECURSION: no sé|#
                       (get-system-drive system) ;cadr de la lista system, system =lista
                       (get-system-usuarios system)
                       (get-system-usuario-conectado system)
-                      (cons letter(get-system-drive-seleccionado system)))
+                      (cons letter(get-system-drive-seleccionado system))
+                      (get-system-ruta system))
                       (display "No se puede seleccionar ese drive porque no existe\n"))))) ;se supone que si no existe la letra en la lista no puede iniciar nada
 ;pero creo que falta que agregar que debe haber tambien un usuario iniciado, componer esa funciones.
 
@@ -120,21 +123,20 @@ RECURSION: no sé|#
          
 
 ;ejemplos
-;(define S100 (system 123)) ;ejemplo donde no arranca un int
-(define S0 (system "NewSystem"))
+(define S0 (system "newSystem"))
 S0
 
-(define S1 ((run S0 add-drive) #\C "SO1" 3000))
-(define S2 ((run S1 add-drive) #\C "SO1" 4000))
-(define S3 ((run S1 add-drive) #\D "Util" 2000))
-;(define S4 ((run S3 add-drive) #\E "INutil" 2000))
+(define S1 ((run S0 add-drive) #\C "SO" 1000))
+;(define S2 ((run S1 add-drive) #\C "SO1" 3000))
+(define S2 ((run S1 add-drive) #\D "Util" 2000))
 S1
-S3
+;S2
+S2
 
-
-(define S12 ((run S3 switch-drive) #\C))
+;(define S11 ((run S2 switch-drive) #\K)) si no hubiera dispplay funcionaria, o sea, funciona pero tira error y no deja avanzar a las que siguen
+(define S12 ((run S2 switch-drive) #\C))
 S12
 
-;S3; chinga en S3, por alguna razon no funciona en los estados que ya me envío un mensaje
+
 
 (provide (all-defined-out))
