@@ -16,4 +16,3 @@
 ":/"
 
 (substring str (- (string-length str) 5) (string-length str))
-

@@ -114,9 +114,13 @@ RECURSION: no sé|#
                       (get-system-drive system) ;cadr de la lista system, system =lista
                       (get-system-usuarios system)
                       (get-system-usuario-conectado system)
-                      (cons letter(get-system-drive-seleccionado system))
-                      (get-system-ruta system))
-                      (display "No se puede seleccionar ese drive porque no existe\n"))))) ;se supone que si no existe la letra en la lista no puede iniciar nada
+                      (if (null?(get-system-drive-seleccionado system))
+                                (cons letter(get-system-drive-seleccionado system)) ;verdaderp
+                                (if(equal? letter (car(get-system-drive-seleccionado system))) ;falso
+                                   (get-system-drive-seleccionado system) ;v
+                                   ((remove (car(get-system-drive-seleccionado system))) (cons letter(get-system-drive-seleccionado system))))) ;f
+                       (get-system-ruta system)); el ultimo elemento de system, cierra make system
+         (display "No se puede seleccionar ese drive porque no existe\n"))))) ;se supone que si no existe la letra en la lista no puede iniciar nada
 ;pero creo que falta que agregar que debe haber tambien un usuario iniciado, componer esa funciones.
 
 ;capa pertenencia verificar si letter es char
@@ -136,7 +140,7 @@ S2
 ;(define S11 ((run S2 switch-drive) #\K)) si no hubiera dispplay funcionaria, o sea, funciona pero tira error y no deja avanzar a las que siguen
 (define S12 ((run S2 switch-drive) #\C))
 S12
-
-
+(define S13 ((run S12 switch-drive) #\D))
+S13
 
 (provide (all-defined-out))
