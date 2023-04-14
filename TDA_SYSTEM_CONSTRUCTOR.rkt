@@ -118,7 +118,7 @@ RECURSION: no sé|#
                                 (cons letter(get-system-drive-seleccionado system)) ;verdaderp
                                 (if(equal? letter (car(get-system-drive-seleccionado system))) ;falso
                                    (get-system-drive-seleccionado system) ;v
-                                   ((remove (car(get-system-drive-seleccionado system))) (cons letter(get-system-drive-seleccionado system))))) ;f
+                                   (cons letter null)))
                        (get-system-ruta system)); el ultimo elemento de system, cierra make system
          (display "No se puede seleccionar ese drive porque no existe\n"))))) ;se supone que si no existe la letra en la lista no puede iniciar nada
 ;pero creo que falta que agregar que debe haber tambien un usuario iniciado, componer esa funciones.
@@ -143,4 +143,7 @@ S12
 (define S13 ((run S12 switch-drive) #\D))
 S13
 
+;((remove letter(string->list(car(get-system-drive-seleccionado system))) (cons letter(get-system-drive-seleccionado system))))) ;f
+
+    
 (provide (all-defined-out))
