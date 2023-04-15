@@ -1,7 +1,8 @@
 #lang racket
 ;Isidora Oyanedel
 ;profesor: Gonzalo Martinez
-;
+
+
 #|TDA System - CONSTRUCTOR
 -----------descripcion del TDA--------------
 Función constructora de un sistema. Deja registro de la fecha de creación.
@@ -78,6 +79,12 @@ sistema. La letra de la unidad es única.
 RECURSION: no
 
 |#
+;capa constructora
+(define (make-carpeta drive string user ) ;el primer elemento es la ruta con la letra, segundo elemento lo ultimo agregado, tercer user, 4to documento 5to, tipo de doc, usuario
+  (list drive string null null (current-seconds))) ;este current seconds es la fecha de modificacion, aunque no se como mantenerlo fijo
+
+
+
 
 ;capa constructora crea la estructura drive
 (define (make-drive letter name capacity)
@@ -115,13 +122,13 @@ RECURSION: no sé|#
                       (get-system-usuarios system)
                       (get-system-usuario-conectado system)
                       (if (null?(get-system-drive-seleccionado system))
-                                (cons letter(get-system-drive-seleccionado system)) ;verdaderp
-                                (if(equal? letter (car(get-system-drive-seleccionado system))) ;falso
-                                   (get-system-drive-seleccionado system) ;v
-                                   (cons letter null)))
-                       (get-system-ruta system)); el ultimo elemento de system, cierra make system
-         (display "No se puede seleccionar ese drive porque no existe\n"))))) ;se supone que si no existe la letra en la lista no puede iniciar nada
-;pero creo que falta que agregar que debe haber tambien un usuario iniciado, componer esa funciones.
+                          (cons letter(get-system-drive-seleccionado system)) ;verdaderp
+                          (if(equal? letter (car(get-system-drive-seleccionado system))) ;falso
+                             (get-system-drive-seleccionado system) ;v
+                             (cons letter null)))
+                      (cons(make-carpeta (string-append (string letter)":/") (cons letter null) (get-system-usuario-conectado system)) null))
+                      (display "No se puede seleccionar ese drive porque no existe\n"))))) ;se supone que si no existe la letra en la lista no puede iniciar nada
+  ;pero creo que falta que agregar que debe haber tambien un usuario iniciado, componer esa funciones.
 
 ;capa pertenencia verificar si letter es char
          
