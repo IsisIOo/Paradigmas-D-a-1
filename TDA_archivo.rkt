@@ -6,11 +6,14 @@
 ;capa constructora, paso 1 para crear el camino
 (define (carpeta string)
     (if(is-string string)
-       (make-carpeta null null null null null)
-       (display "no se puede crear la ruta")))
+       (make-carpeta null null null null null null)
+       #f))
 
-(define (crear-ruta cd1)
-      (list cd1))
+(define (files string)
+  (list string null null))
+
+;IMPORTANTE
+;(string #\D)
 
 
 
@@ -52,7 +55,7 @@ modificación y atributos de seguridad como los señalados en el enunciado gener
 #|FUNCION 10 CD
 DOMINIO: system X path or folderName (String)
 RECORRIDO: system
-RECURSION: NO C
+RECURSION: NO
 DESCRIPCION: función que permite cambiar la ruta (path) donde se realizarán operaciones.
 cd permite cambiarse a un directorio especificado a partir de la ruta señalada en un String.
 Además, contará con con los comodines especiales “/” que permitirán
@@ -62,50 +65,66 @@ la unidad respectivamente.|#
 (define cd
   (lambda(system)
     (lambda (path)
-      (if(or(is-string path)(member path (map cadr(get-system-ruta system))))      ;(member path (map cadr (get-system-ruta system)
-         (if (equal? path "..")
+      (if (is-string path)
+          (if(member path (map cadr(get-system-ruta system)))
              (make-system(get-system-name system);verdadero
                          (get-system-drive system)
                          (get-system-usuarios system)
                          (get-system-usuario-conectado system)
                          (get-system-drive-seleccionado system)
-                         (cons(make-carpeta (string-join(reverse(cdr(reverse(string-split (get-posicion system) "/"))))"/")
+                         (cons(make-carpeta (string-append (get-posicion system) path "/")
                                             null
                                             (get-system-usuario-conectado system))
-                                            (get-system-ruta system)))
-             (if(equal? path "/")
-                (make-system(get-system-name system);verdadero
-                            (get-system-drive system)
-                            (get-system-usuarios system)
-                            (get-system-usuario-conectado system)
-                            (get-system-drive-seleccionado system)
-                            (cons(make-carpeta (substring (car(car(get-system-ruta system))) 0 3)
+                              (get-system-ruta system)))
+             (if (equal? path "..")
+                 (make-system(get-system-name system);verdadero
+                             (get-system-drive system)
+                             (get-system-usuarios system)
+                             (get-system-usuario-conectado system)
+                             (get-system-drive-seleccionado system)
+                             (cons(make-carpeta (string-append(string-join(reverse(cdr(reverse(string-split (get-posicion system) "/"))))"/")"/")
                                                 null
-                                               (get-system-usuario-conectado system))
-                                               (get-system-ruta system)))
-             
-                (make-system(get-system-name system);verdadero
-                            (get-system-drive system)
-                            (get-system-usuarios system)
-                            (get-system-usuario-conectado system)
-                            (get-system-drive-seleccionado system)
-                            (cons(make-carpeta (string-append (get-posicion system) path "/")
-                                               null
-                                               (get-system-usuario-conectado system))
-                                               (get-system-ruta system)))))
-                     
-                (make-system(get-system-name system);verdadero
-                            (get-system-drive system)
-                            (get-system-usuarios system)
-                            (get-system-usuario-conectado system)
-                            (get-system-drive-seleccionado system)
-                            (make-carpeta (get-system-ruta system)
-                                          null
-                                          (get-system-usuario-conectado system)))))))     
+                                                (get-system-usuario-conectado system))
+                                  (get-system-ruta system)))
+                    
+                 (if(equal? path "/")
+                    (make-system(get-system-name system);verdadero
+                                (get-system-drive system)
+                                (get-system-usuarios system)
+                                (get-system-usuario-conectado system)
+                                (get-system-drive-seleccionado system)
+                                (cons(make-carpeta (substring (car(car(get-system-ruta system))) 0 3)
+                                                   null
+                                                   (get-system-usuario-conectado system))
+                                     (get-system-ruta system)))
+
+                    (if(member (car(reverse(string-split path "/")))(map cadr(get-system-ruta system)))
+                       (make-system(get-system-name system)
+                                   (get-system-drive system)
+                                   (get-system-usuarios system)
+                                   (get-system-usuario-conectado system)
+                                   (car(string-split path "/"))
+                                   (cons(make-carpeta path
+                                            null
+                                            (get-system-usuario-conectado system))
+                              (get-system-ruta system)))
+
+                    (make-system(get-system-name system);verdadero
+                                (get-system-drive system)
+                                (get-system-usuarios system)
+                                (get-system-usuario-conectado system)
+                                (get-system-drive-seleccionado system)
+                                (get-system-ruta system))))))
+                       
+          (make-system(get-system-name system);verdadero
+                      (get-system-drive system)
+                      (get-system-usuarios system)
+                      (get-system-usuario-conectado system)
+                      (get-system-drive-seleccionado system)
+                      (get-system-ruta system))))))
 
 
-;(filter (lambda (x) (eq? (car x) 5)) mi-lista))
-                     
+                        
   
 
 #|FUNCION 11  TDA system - add-file
@@ -115,14 +134,76 @@ RECURSION: NOC
 DESCRIPCION:función que permite añadir un archivo en la ruta actual.
 |#
 
+#|(define add-file
+  (lambda(system)
+    (lambda(file)|#
+      
       
 
 
 
+#|FUNCION 18 FORMAT
+DOMINIO:system X letter (char) X name (String)
+RECORRIDO: system 
+RECURSION: NO
+DESCRIPCION:función para formatear una unidad dada su letra, lo que borra todo su contenido,
+además de indicar nuevo nombre, pero conservando capacidad.
+|#
+
+(define format
+  (lambda (system)
+    (lambda(letter nombre)
+      (if(and(is-char letter)(is-string nombre))
+         (capacidad letter system nombre)
+         
+         (make-system(get-system-name system);verdadero
+                     (get-system-drive system)
+                     (get-system-usuarios system)
+                     (get-system-usuario-conectado system)
+                     (get-system-drive-seleccionado system)
+                     (get-system-ruta system))))))
 
 
 
+;capa selectora, la pude hacer en la funcion pero me costo el filter. saca los elementos de la lista que tienen la misma primera letra en el primer elemento
+(define (remove letter system)
+      (filter (lambda(x)(if (not(equal?(string-append(string letter)":") (car(string-split (car x) "/"))))
+                            #t
+                            #f))
+              (get-system-ruta system)))
 
+
+;capa selectora elimina los drives que tengan la misma letra de primer elemento que la letra que entra, lo hace en un lugar diferente que el de arriba
+(define (remove2 letter system) 
+      (filter (lambda(x)(if (not(equal? letter  (car x)))
+                            #t
+                            #f))
+              (get-system-drive system)))
+
+
+
+;capa selectora, encuentra el drive con la misma letra para sacar propiedades/capacidad
+(define (no-remove letter system)
+      (filter (lambda(x)(if (equal? letter (car x))
+                            #t
+                            #f))
+              (get-system-drive system)))
+
+
+;capa modificadora obtener capacidad
+(define (capacidad letter system nombre)
+  (if (and(is-string nombre)(is-char letter))
+      (if (member letter (map car(get-system-drive system)))
+          ;(map caddr (get-system-drive S30)) capacidades
+          (make-system(get-system-name system);verdadero
+                      (cons(make-drive letter nombre (car (cdr (cdr (car(no-remove letter system))))))(remove2 letter system))
+                      (get-system-usuarios system)
+                      (get-system-usuario-conectado system)
+                      (get-system-drive-seleccionado system)
+                      (remove letter system))
+          #f)
+      #f))
+              
 
 
 
@@ -141,24 +222,22 @@ DESCRIPCION:función que permite añadir un archivo en la ruta actual.
 
 ;;ingresa a subcarpeta e intenta ingresar a subcarpeta inexistente S21
 (define S20 ((run S19 cd) "folder21")) ;funciona
-(define S21 ((run S20 cd) "folder22")) ;no agrega el folder22 a la ruta actual
+(define S21 ((run S20 cd) "folder22")) ;funciona 16-04-23
 
 ;;vuelve a carpeta anterior
-(define S22 ((run S21 cd) ".."))
+(define S22 ((run S21 cd) ".."))  ;funciona 16-04-23
 
 ;;vuelve a ingresar folder21
-(define S23 ((run S22 cd) "folder21"))
+(define S23 ((run S22 cd) "folder21")) ;segun yo si deberia poder a entrar, pues la carpeta no se ha eliminado. Agregar "/"
 
 ;crea subcarpeta folder211 e ingresa
-(define S24 ((run S23 md) "folder211"))
-(define S25 ((run S24 cd) "folder211"))
+(define S24 ((run S23 md) "folder211")) ;funciona 16-04-23
+(define S25 ((run S24 cd) "folder211")) ;funciona 16-04-23
 
 ;vuelve a la raíz de la unidad c:/
-(define S26 ((run S25 cd) "/"))
-
-
+(define S26 ((run S25 cd) "/")) ;funciona 16-04-23
       
-S13
+#|S13
 S14
 S15
 S16
@@ -167,9 +246,46 @@ S18
 S19
 S20
 S21
-#|S22|#
+S22
+S23
+S24
+S25
+S26 ;todo bem|#
 
-;S26
+    
+;se cambia de unidad
+(define S27 ((run S26 switch-drive) #\D)) ;FUNCIONA
+
+;crea carpeta e ingresa a carpeta
+(define S28 ((run S27 md) "folder5")) ;FUNCIONA
+(define S29 ((run S28 cd) "folder5")) ;FUNCIONA
+
+;se cambia de carpeta en base a la ruta especificada
+(define S30 ((run S29 cd) "C:/folder1/")) ;no funciona, supongo que la dejaré sin funcionar 75%
+
+;formateando drive D:
+(define S31 ((run S30 format) #\D "newD")) ;FUNCIONAAAA 17-04-2023
+      
+;añadiendo archivos
+;(define S32 ((run S31 add-file) (file "foo1.txt" "txt" "hello world 1")))
+;(define S33 ((run S32 add-file) (file "foo2.txt" "txt" "hello world 2")))
+;(define S34 ((run S33 add-file) (file "foo3.docx" "docx" "hello world 3")))
+;(define S35 ((run S34 add-file) (file "goo4.docx" "docx" "hello world 4" #\h #\r)))
+;con atributos de seguridad oculto (h) y de solo lectura (r)
+
+
+
+
+
+      
+S27
+S28
+S29
+S30
+S31
+
+
+
 ;(cons(make-carpeta (string-append (string(car(get-system-drive-seleccionado system)))":/" nombre "/")
 
 

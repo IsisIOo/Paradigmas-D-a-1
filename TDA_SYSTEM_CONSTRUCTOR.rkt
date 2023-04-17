@@ -126,7 +126,7 @@ RECURSION: no sé|#
                           (if(equal? letter (car(get-system-drive-seleccionado system))) ;falso
                              (get-system-drive-seleccionado system) ;v
                              (cons letter null)))
-                      (cons(make-carpeta (string-append (string letter)":/") (cons letter null) (get-system-usuario-conectado system)) null))
+                      (cons(make-carpeta (string-append (string letter)":/") (cons letter null) (get-system-usuario-conectado system)) (get-system-ruta system)))
                       (display "No se puede seleccionar ese drive porque no existe\n"))))) ;se supone que si no existe la letra en la lista no puede iniciar nada
   ;pero creo que falta que agregar que debe haber tambien un usuario iniciado, componer esa funciones.
 
