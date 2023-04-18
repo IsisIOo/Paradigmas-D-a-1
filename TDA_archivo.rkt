@@ -21,7 +21,7 @@
 ;capa selectora
 (define get-posicion (lambda(system) (car(car(car(cdr(cdr(cdr(cdr(cdr system))))))))))
 (define get-my-string-posicion (lambda (system) (car(car(get-system-ruta system))))) ;obtiene el string de la ultima ruta utilizada
-
+(define get-files (lambda (system) (car(cdr(cdr(car(get-system-ruta system)))))))
 
 ;CAPA MODIFICADORA
 
@@ -43,7 +43,8 @@ modificación y atributos de seguridad como los señalados en el enunciado gener
                      (get-system-usuarios system)
                      (get-system-usuario-conectado system)
                      (get-system-drive-seleccionado system)
-                     (cons(make-carpeta (get-posicion system) nombre (get-system-usuario-conectado system)) (get-system-ruta system)))
+                     (cons(make-carpeta (get-posicion system) nombre (get-system-usuario-conectado system)
+                                        '()) (get-system-ruta system)))
          
          (make-system(get-system-name system);falso
                      (get-system-drive system)
@@ -74,7 +75,8 @@ la unidad respectivamente.|#
                          (get-system-drive-seleccionado system)
                          (cons(make-carpeta (string-append (get-posicion system) path "/")
                                             null
-                                            (get-system-usuario-conectado system))
+                                            (get-system-usuario-conectado system)
+                                            '())
                               (get-system-ruta system)))
              (if (equal? path "..")
                  (make-system(get-system-name system);verdadero
@@ -84,7 +86,8 @@ la unidad respectivamente.|#
                              (get-system-drive-seleccionado system)
                              (cons(make-carpeta (string-append(string-join(reverse(cdr(reverse(string-split (get-posicion system) "/"))))"/")"/")
                                                 null
-                                                (get-system-usuario-conectado system))
+                                                (get-system-usuario-conectado system)
+                                                '())
                                   (get-system-ruta system)))
                     
                  (if(equal? path "/")
@@ -95,7 +98,8 @@ la unidad respectivamente.|#
                                 (get-system-drive-seleccionado system)
                                 (cons(make-carpeta (substring (car(car(get-system-ruta system))) 0 3)
                                                    null
-                                                   (get-system-usuario-conectado system))
+                                                   (get-system-usuario-conectado system)
+                                                   '())
                                      (get-system-ruta system)))
 
                     (if(member (car(reverse(string-split path "/")))(map cadr(get-system-ruta system)))
@@ -105,8 +109,9 @@ la unidad respectivamente.|#
                                    (get-system-usuario-conectado system)
                                    (car(string-split path "/"))
                                    (cons(make-carpeta path
-                                            null
-                                            (get-system-usuario-conectado system))
+                                                      null
+                                                      (get-system-usuario-conectado system)
+                                                      '())
                               (get-system-ruta system)))
 
                     (make-system(get-system-name system);verdadero
@@ -133,13 +138,39 @@ RECORRIDO: system
 RECURSION: NOC
 DESCRIPCION:función que permite añadir un archivo en la ruta actual.
 |#
-
-#|(define add-file
+(define add-file
   (lambda(system)
-    (lambda(file)|#
+    (lambda(file)
+      (if (map is-string (list file))
+          (make-system(get-system-name system)
+                      (get-system-drive system)
+                      (get-system-usuarios system)
+                      (get-system-usuario-conectado system)
+                      (get-system-drive-seleccionado system)
+                      (cons(make-carpeta (get-posicion system)
+                                         null
+                                         (get-system-usuario-conectado system)
+                                         (cons file (get-files system)))           
+                           (get-system-ruta system)))
+          
+          (make-system(get-system-name system)
+                      (get-system-drive system)
+                      (get-system-usuarios system)
+                      (get-system-usuario-conectado system)
+                      (get-system-drive-seleccionado system)
+                      (get-system-ruta system))))))
       
       
+      
+;capa constructora crea la list que contendrá los elementos del file
+(define (make-file nombre ext cont rest) ;rest = atr1 atr2
+  (list nombre ext cont rest))
 
+;capa constructora, crea una variable del mismo nombre que lo que entra en la funcion para que lo que entregue se transforme en lista y sea trabajado como lista
+(define file ;como makedrive
+  (lambda (nombre ext cont . rest)
+    (make-file nombre ext cont rest)))
+    
 
 
 #|FUNCION 18 FORMAT
@@ -161,7 +192,7 @@ además de indicar nuevo nombre, pero conservando capacidad.
                      (get-system-usuarios system)
                      (get-system-usuario-conectado system)
                      (get-system-drive-seleccionado system)
-                     (get-system-ruta system))))))
+                     (string-downcase (car(car(get-system-ruta system)))))))))
 
 
 
@@ -267,10 +298,10 @@ S26 ;todo bem|#
 (define S31 ((run S30 format) #\D "newD")) ;FUNCIONAAAA 17-04-2023
       
 ;añadiendo archivos
-;(define S32 ((run S31 add-file) (file "foo1.txt" "txt" "hello world 1")))
-;(define S33 ((run S32 add-file) (file "foo2.txt" "txt" "hello world 2")))
-;(define S34 ((run S33 add-file) (file "foo3.docx" "docx" "hello world 3")))
-;(define S35 ((run S34 add-file) (file "goo4.docx" "docx" "hello world 4" #\h #\r)))
+(define S32 ((run S31 add-file) (file "foo1.txt" "txt" "hello world 1"))) ;funciona 17-04 
+(define S33 ((run S32 add-file) (file "foo2.txt" "txt" "hello world 2"))) ;funciona 17-04 
+(define S34 ((run S33 add-file) (file "foo3.docx" "docx" "hello world 3"))) ;funciona 17-04 
+(define S35 ((run S34 add-file) (file "goo4.docx" "docx" "hello world 4" #\h #\r))) ;funciona 17-04 , no me agrada la lista
 ;con atributos de seguridad oculto (h) y de solo lectura (r)
 
 
@@ -283,8 +314,10 @@ S28
 S29
 S30
 S31
-
-
+S32
+S33
+S34
+S35
 
 ;(cons(make-carpeta (string-append (string(car(get-system-drive-seleccionado system)))":/" nombre "/")
 

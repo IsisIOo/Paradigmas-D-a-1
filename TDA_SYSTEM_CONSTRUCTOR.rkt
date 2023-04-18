@@ -19,13 +19,11 @@ debe tener el nombre system y funcionar con las cosas del doc
 probablemente se usa el TDA FECHA
 |#
 
-;(define (system string) 
- ; (list string 16042023))
 
 (define (system string)
   (if(is-string string)
      (make-system string null null null null null) ;el primer elemento es el nombre, siguiente drive, sig usuario
-     (display "no se creará el sistema")))    ;por mientras así, no creará el sistema si es numeros
+     #f))    ;por mientras así, no creará el sistema si es numeros
 
 
 
@@ -80,10 +78,8 @@ RECURSION: no
 
 |#
 ;capa constructora
-(define (make-carpeta drive string user ) ;el primer elemento es la ruta con la letra, segundo elemento lo ultimo agregado, tercer user, 4to documento 5to, tipo de doc, usuario
-  (list drive string null null (current-seconds))) ;este current seconds es la fecha de modificacion, aunque no se como mantenerlo fijo
-
-
+(define (make-carpeta drive string user file) ;el primer elemento es la ruta con la letra, segundo elemento lo ultimo agregado, tercer user, 4to documento 5to, tipo de doc, usuario
+  (list drive string file (current-seconds))) ;este current seconds es la fecha de modificacion, aunque no se como mantenerlo fijo
 
 
 ;capa constructora crea la estructura drive
@@ -126,7 +122,8 @@ RECURSION: no sé|#
                           (if(equal? letter (car(get-system-drive-seleccionado system))) ;falso
                              (get-system-drive-seleccionado system) ;v
                              (cons letter null)))
-                      (cons(make-carpeta (string-append (string letter)":/") (cons letter null) (get-system-usuario-conectado system)) (get-system-ruta system)))
+                      (cons(make-carpeta (string-append (string letter)":/") (cons letter null) (get-system-usuario-conectado system)
+                                         '()) (get-system-ruta system)))
                       (display "No se puede seleccionar ese drive porque no existe\n"))))) ;se supone que si no existe la letra en la lista no puede iniciar nada
   ;pero creo que falta que agregar que debe haber tambien un usuario iniciado, componer esa funciones.
 
