@@ -23,7 +23,6 @@
 (define get-my-string-posicion (lambda (system) (car(car(get-system-ruta system))))) ;obtiene el string de la ultima ruta utilizada
 (define get-files (lambda (system) (car(cdr(cdr(car(get-system-ruta system)))))))
 
-;CAPA MODIFICADORA
 
 
 #|FUNCION 9 md
@@ -171,6 +170,31 @@ DESCRIPCION:función que permite añadir un archivo en la ruta actual.
   (lambda (nombre ext cont . rest)
     (make-file nombre ext cont rest)))
     
+#|TDA FUNCION 12 DEL
+DOMINIO:system X fileName or fileNamePattern (string)
+RECORRIDO: system
+RECURSION: NO C
+DESCRIPCION: función para eliminar un archivo o varios archivos en base a un patrón determinado.
+Esta versión también puede eliminar una carpeta completa con todos sus subdirectorios.
+El contenido eliminado se va a la papelera.
+|#
+
+;muchos filtros
+;if null remove
+;
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 #|FUNCION 18 FORMAT
@@ -303,6 +327,13 @@ S26 ;todo bem|#
 (define S34 ((run S33 add-file) (file "foo3.docx" "docx" "hello world 3"))) ;funciona 17-04 
 (define S35 ((run S34 add-file) (file "goo4.docx" "docx" "hello world 4" #\h #\r))) ;funciona 17-04 , no me agrada la lista
 ;con atributos de seguridad oculto (h) y de solo lectura (r)
+
+;eliminando archivos
+(define S36 ((run S35 del) "*.txt"))
+(define S37 ((run S35 del) "f*.docx"))
+(define S38 ((run S35 del) "goo4.docx"))
+(define S39 ((run S35 cd) ".."))
+(define S40 ((run S35 del) "folder1"))
 
 
 
