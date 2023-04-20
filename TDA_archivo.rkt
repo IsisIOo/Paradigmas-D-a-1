@@ -77,7 +77,7 @@ la unidad respectivamente.|#
                                             (get-system-usuario-conectado system)
                                             '())
                               (get-system-ruta system)))
-             (if (equal? path "..")
+             (if (equal? path "..") ;vuelve a carpeta anterior
                  (make-system(get-system-name system);verdadero
                              (get-system-drive system)
                              (get-system-usuarios system)
@@ -89,7 +89,7 @@ la unidad respectivamente.|#
                                                 '())
                                   (get-system-ruta system)))
                     
-                 (if(equal? path "/")
+                 (if(equal? path "/") ;vuelve a raiz
                     (make-system(get-system-name system);verdadero
                                 (get-system-drive system)
                                 (get-system-usuarios system)
@@ -181,7 +181,65 @@ El contenido eliminado se va a la papelera.
 
 ;muchos filtros
 ;if null remove
-;
+;(equal? (car(string->list "foo1.txt")) #\f)
+
+(define del
+  (lambda (system)
+    (lambda (filename)
+      (if(is-string filename)
+         (if (or(equal? (car(string-split filename "*")) ".txt")(equal? (car(string-split filename "*")) ".docx"))
+             (make-system(get-system-name system)
+                         (get-system-drive system)
+                         (get-system-usuarios system)
+                         (get-system-usuario-conectado system)
+                         (get-system-drive-seleccionado system)
+                         (cons(make-carpeta (get-posicion system)
+                                            null
+                                            (get-system-usuario-conectado system)
+                                            (remove-extension (car (string-split (car(string-split filename "*")) ".")) system))           
+                              (get-system-ruta system)))
+             
+             (if (member (car(string-split filename "*")) (map string(map car(map string->list (map car(get-files system))))))
+                 (make-system(get-system-name system)
+                             (get-system-drive system)
+                             (get-system-usuarios system)
+                             (get-system-usuario-conectado system)
+                             (get-system-drive-seleccionado system)
+                             (cons(make-carpeta (get-posicion system)
+                                                null
+                                                (get-system-usuario-conectado system)
+                                                (letter-titles filename system))           
+                                  (get-system-ruta system)))
+                 
+                 (if (member filename (map car(get-files system)))
+                     (make-system(get-system-name system)
+                                 (get-system-drive system)
+                                 (get-system-usuarios system)
+                                 (get-system-usuario-conectado system)
+                                 (get-system-drive-seleccionado system)
+                                 (cons(make-carpeta (get-posicion system)
+                                                    null
+                                                    (get-system-usuario-conectado system)
+                                                    (remove-titulo filename system))           
+                                      (get-system-ruta system)))
+                     (if (member filename (map cadr(get-system-ruta system)))
+                         (make-system(get-system-name system)
+                                 (get-system-drive system)
+                                 (get-system-usuarios system)
+                                 (get-system-usuario-conectado system)
+                                 (get-system-drive-seleccionado system)
+                                 (cons(make-carpeta  (string-append(string-join(reverse(cdr(reverse(string-split (get-posicion system) "/"))))"/")"/")
+                                                    null
+                                                    (get-system-usuario-conectado system)
+                                                    '())           
+                                      (get-system-ruta system)))
+                     #f))))  
+         #f))))
+
+
+
+
+
 
 
 
@@ -210,7 +268,6 @@ además de indicar nuevo nombre, pero conservando capacidad.
     (lambda(letter nombre)
       (if(and(is-char letter)(is-string nombre))
          (capacidad letter system nombre)
-         
          (make-system(get-system-name system);verdadero
                      (get-system-drive system)
                      (get-system-usuarios system)
@@ -235,6 +292,38 @@ además de indicar nuevo nombre, pero conservando capacidad.
                             #f))
               (get-system-drive system)))
 
+;CAPA SELECTORA REMOVE 3, HARA LO MISMO QUE REMOVE 2 SOLO QUE CON OTRA PARTE DEL SYSTEM
+(define (remove-extension filename system) 
+      (filter (lambda(x) (if (not(equal? filename (cadr x)))
+                            #t
+                            #f))
+              (get-files system)))
+  
+;capa selectora, REMUEVE LOS QUE TENGAN EL MISMO TITULO, ME PERDI CON TANTO FILTRO PERO ALGUNO DEBE SER PARECIDO
+(define (remove-titulo filename system) 
+      (filter (lambda(x) (if (not(equal? filename (car x)))
+                            #t
+                            #f))
+              (get-files system)))
+
+
+;CAPA SELECTORA, necesito que me haga lista de los titulos de cada file
+(define (letter-titles filename system) 
+   (filter (lambda(x) (if(not(and(equal? (car(string-split filename "*")) (string(car(string->list(car x)))))
+                                 (equal? (car(string-split (cadr(string-split filename "*")) ".")) (car(cdr x)))))
+                    #t
+                   #f))
+       (get-files system)))
+;(car(string-split (cadr(string-split "f*.docx" "*")) ".")) =docx 
+
+
+    
+;capa de pertenencia
+(define(decision1 filename system)
+  (lambda(x) (if(equal? (car(string-split filename "*")) (string(car(string->list(car x)))))
+    #t
+    #f))
+  (get-files system))
 
 
 ;capa selectora, encuentra el drive con la misma letra para sacar propiedades/capacidad
@@ -329,18 +418,18 @@ S26 ;todo bem|#
 ;con atributos de seguridad oculto (h) y de solo lectura (r)
 
 ;eliminando archivos
-(define S36 ((run S35 del) "*.txt"))
-(define S37 ((run S35 del) "f*.docx"))
-(define S38 ((run S35 del) "goo4.docx"))
-(define S39 ((run S35 cd) ".."))
-(define S40 ((run S35 del) "folder1"))
+(define S36 ((run S35 del) "*.txt")) ;borra todos los txt ;FUNCIONA 19-04
+(define S37 ((run S35 del) "f*.docx")) ;borra los que comienzan con f y tengan extension .doc BORRA 1 ;FUNCIONA 19-04
+(define S38 ((run S35 del) "goo4.docx")) ;borra el que tiene ese titulo ;FUNCIONA 19-04
+(define S39 ((run S35 cd) "..")) ;FUNCIONA 19-04
+(define S40 ((run S35 del) "folder1")) ;borra la carpeta con todo FUNCIONA 19-04
 
 
 
 
 
       
-S27
+#|S27
 S28
 S29
 S30
@@ -349,8 +438,15 @@ S32
 S33
 S34
 S35
+S36
+S37
+S38
+S39
+S40|#
 
-;(cons(make-carpeta (string-append (string(car(get-system-drive-seleccionado system)))":/" nombre "/")
+
+
+
 
 
 ;MD NO REPITE CARPETAS, EN ESO FUNCIONA
