@@ -15,15 +15,10 @@
 ;IMPORTANTE
 ;(string #\D)
 
-
-
-
 ;capa selectora
 (define get-posicion (lambda(system) (car(car(car(cdr(cdr(cdr(cdr(cdr system))))))))))
 (define get-my-string-posicion (lambda (system) (car(car(get-system-ruta system))))) ;obtiene el string de la ultima ruta utilizada
 (define get-files (lambda (system) (car(cdr(cdr(car(get-system-ruta system)))))))
-
-
 
 #|FUNCION 9 md
 DOMINIO: system X name (String) 
@@ -126,10 +121,7 @@ la unidad respectivamente.|#
                       (get-system-usuario-conectado system)
                       (get-system-drive-seleccionado system)
                       (get-system-ruta system))))))
-
-
-                        
-  
+                         
 
 #|FUNCION 11  TDA system - add-file
 DOMINIO:system X file
@@ -233,11 +225,16 @@ El contenido eliminado se va a la papelera.
                                                     (get-system-usuario-conectado system)
                                                     '())           
                                       (get-system-ruta system)))
-                     #f))))  
+                     #f))))  ;agregar el normal
          #f))))
 
 
-
+#|FUNCION 13 RD
+DOMINIO:system X folderName or folderPath (string)
+RECORRIDO: system
+RECURSION: no obigatoria asi que no
+DESCRIPCION:  función para eliminar una carpeta, siempre y cuando ésta esté vacía.
+Una carpeta se puede eliminar estando posicionado fuera de ésta. |#
 
 
 
@@ -318,13 +315,6 @@ además de indicar nuevo nombre, pero conservando capacidad.
 
 
     
-;capa de pertenencia
-(define(decision1 filename system)
-  (lambda(x) (if(equal? (car(string-split filename "*")) (string(car(string->list(car x)))))
-    #t
-    #f))
-  (get-files system))
-
 
 ;capa selectora, encuentra el drive con la misma letra para sacar propiedades/capacidad
 (define (no-remove letter system)
@@ -445,12 +435,6 @@ S39
 S40|#
 
 
-
-
-
-
-;MD NO REPITE CARPETAS, EN ESO FUNCIONA
-;CD NO DEJA METER CARPETAS DENTRO DE CARPETAS
 
 ;(make-carpeta (string-append (string(car(get-system-drive-seleccionado system)))":/") (append(crear-ruta path)(filter (lambda (x) (eq? (cadr x) path))(get-system-ruta system))) (get-system-usuario-conectado system))
 ;                         (get-system-ruta system))) ;si está en el resto de lugares no se agrega
