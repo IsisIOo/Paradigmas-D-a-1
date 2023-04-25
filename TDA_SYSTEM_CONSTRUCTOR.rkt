@@ -90,10 +90,16 @@ RECURSION: no
   (lambda(system)
     (lambda (letter name capacity);info del drive
       (if(member letter (map car(get-system-drive system)))
-         (display "ya existe una drive con esa letra \n")
+         (make-system(get-system-name system) ;lo mantiene
+                     (get-system-drive system) 
+                     (get-system-usuarios system)
+                     (get-system-usuario-conectado system)
+                     (get-system-drive-seleccionado system)
+                     (get-system-ruta system))
+         
          (make-system (get-system-name system)
                       (cons(make-drive letter name capacity) ;;make-drive= lista que recibe 3 cosas, y le agrega algo adelante de 3 cosas
-                      (get-system-drive system)) ;cadr de la lista system, system =lista
+                           (get-system-drive system)) ;cadr de la lista system, system =lista
                       (get-system-usuarios system)
                       (get-system-usuario-conectado system)
                       (get-system-drive-seleccionado system)
@@ -118,13 +124,21 @@ RECURSION: no sé|#
                       (get-system-usuarios system)
                       (get-system-usuario-conectado system)
                       (if (null?(get-system-drive-seleccionado system))
-                          (cons letter(get-system-drive-seleccionado system)) ;verdaderp
-                          (if(equal? letter (car(get-system-drive-seleccionado system))) ;falso
+                          (cons letter (get-system-drive-seleccionado system)) ;verdaderp
+                          (if(equal?  letter (car(get-system-drive-seleccionado system))) ;falso
                              (get-system-drive-seleccionado system) ;v
                              (cons letter null)))
-                      (cons(make-carpeta (string-append (string letter)":/") (cons letter null) (get-system-usuario-conectado system)
+                      (cons(make-carpeta (string-downcase(string-append (string letter)":/"))
+                                         (cons letter null)
+                                         (get-system-usuario-conectado system)
                                          '()) (get-system-ruta system)))
-                      (display "No se puede seleccionar ese drive porque no existe\n"))))) ;se supone que si no existe la letra en la lista no puede iniciar nada
+         
+         (make-system(get-system-name system) ;en caso contrario solo lo mantiene
+                     (get-system-drive system) 
+                     (get-system-usuarios system)
+                     (get-system-usuario-conectado system)
+                     (get-system-drive-seleccionado system)
+                     (get-system-ruta system)))))) ;se supone que si no existe la letra en la lista no puede iniciar nada
   ;pero creo que falta que agregar que debe haber tambien un usuario iniciado, componer esa funciones.
 
 ;capa pertenencia verificar si letter es char

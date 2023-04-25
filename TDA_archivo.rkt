@@ -20,6 +20,7 @@
 (define get-my-string-posicion (lambda (system) (car(car(get-system-ruta system))))) ;obtiene el string de la ultima ruta utilizada
 (define get-files (lambda (system) (car(cdr(cdr(car(get-system-ruta system)))))))
 (define get-carpetas (lambda (system) (car(cdr(car(get-system-ruta system))))))
+
 #|FUNCION 9 md
 DOMINIO: system X name (String) 
 RECORRIDO: SYSTEM
@@ -37,7 +38,7 @@ modificación y atributos de seguridad como los señalados en el enunciado gener
                      (get-system-usuarios system)
                      (get-system-usuario-conectado system)
                      (get-system-drive-seleccionado system)
-                     (cons(make-carpeta (get-posicion system) nombre (get-system-usuario-conectado system)
+                     (cons(make-carpeta (string-downcase(get-posicion system)) nombre (get-system-usuario-conectado system)
                                         '()) (get-system-ruta system)))
          
          (make-system(get-system-name system);falso
@@ -61,13 +62,13 @@ la unidad respectivamente.|#
   (lambda(system)
     (lambda (path)
       (if (is-string path)
-          (if(and(member path (map cadr(get-system-ruta system)))(not(member path (string-split(get-posicion system)"/"))))
+          (if(and(member path (map cadr(get-system-ruta system)))(not(member (string-downcase path) (string-split(string-downcase(get-posicion system))"/"))))
              (make-system(get-system-name system) ;si existe la carpeta y no está abierto en la ruta, le deja entrar, recupera los archivos que tenia por ultima vez
                          (get-system-drive system)
                          (get-system-usuarios system)
                          (get-system-usuario-conectado system)
                          (get-system-drive-seleccionado system)
-                         (cons(make-carpeta (string-append (get-posicion system) path "/")
+                         (cons(make-carpeta (string-downcase(string-append (get-posicion system) path "/"))
                                             null
                                             (get-system-usuario-conectado system)
                                             (rec-archivos path system))
@@ -78,7 +79,7 @@ la unidad respectivamente.|#
                              (get-system-usuarios system)
                              (get-system-usuario-conectado system)
                              (get-system-drive-seleccionado system)
-                             (cons(make-carpeta (string-append(string-join(reverse(cdr(reverse(string-split (get-posicion system) "/"))))"/")"/")
+                             (cons(make-carpeta (string-downcase(string-append(string-join(reverse(cdr(reverse(string-split (get-posicion system) "/"))))"/")"/"))
                                                 null
                                                 (get-system-usuario-conectado system)
                                                 (rec-archivos path system))
@@ -96,13 +97,13 @@ la unidad respectivamente.|#
                                                    (rec-archivos path system))
                                      (get-system-ruta system)))
 
-                    (if(member (car(reverse(string-split path "/")))(map cadr(get-system-ruta system)))  ;cuando recibe ruta c;/apsdk
+                    (if(member (string-downcase(car(reverse(string-split path "/"))))(map cadr(get-system-ruta system)))  ;cuando recibe ruta c;/apsdk
                        (make-system(get-system-name system)
                                    (get-system-drive system)
                                    (get-system-usuarios system)
                                    (get-system-usuario-conectado system)
                                    (car(string-split path "/"))
-                                   (cons(make-carpeta path
+                                   (cons(make-carpeta (string-downcase path)
                                                       null
                                                       (get-system-usuario-conectado system)
                                                       (rec-archivos path system)) ;AQUI ARCHIVOS
@@ -123,6 +124,7 @@ la unidad respectivamente.|#
                       (get-system-ruta system))))))
 ;le puse para que todos recuperen sus respectivos archivos            
 
+
 #|FUNCION 11  TDA system - add-file
 DOMINIO:system X file
 RECORRIDO: system
@@ -138,7 +140,7 @@ DESCRIPCION:función que permite añadir un archivo en la ruta actual.
                       (get-system-usuarios system)
                       (get-system-usuario-conectado system)
                       (get-system-drive-seleccionado system)
-                      (cons(make-carpeta (get-posicion system)
+                      (cons(make-carpeta (string-downcase(get-posicion system))
                                          (car(reverse(string-split(get-posicion system)"/"))) ;DUEÑO
                                          (get-system-usuario-conectado system)
                                          (cons file (get-files system)))           
@@ -183,8 +185,8 @@ El contenido eliminado se va a la papelera.
                          (get-system-usuarios system)
                          (get-system-usuario-conectado system)
                          (get-system-drive-seleccionado system)
-                         (cons(make-carpeta (get-posicion system)
-                                            (car(reverse(string-split(get-posicion system)"/")))
+                         (cons(make-carpeta (string-downcase(get-posicion system))
+                                            (string-downcase(car(reverse(string-split(get-posicion system)"/"))))
                                             (get-system-usuario-conectado system)
                                             (remove-extension (car (string-split (car(string-split filename "*")) ".")) system))           
                               (get-system-ruta system)))
@@ -196,8 +198,8 @@ El contenido eliminado se va a la papelera.
                              (get-system-usuarios system)
                              (get-system-usuario-conectado system)
                              (get-system-drive-seleccionado system)
-                             (cons(make-carpeta (get-posicion system)
-                                                (car(reverse(string-split(get-posicion system)"/")))
+                             (cons(make-carpeta (string-downcase(get-posicion system))
+                                                (string-downcase(car(reverse(string-split(get-posicion system)"/"))))
                                                 (get-system-usuario-conectado system)
                                                 (letter-titles filename system))           
                                   (get-system-ruta system)))
@@ -208,7 +210,7 @@ El contenido eliminado se va a la papelera.
                                  (get-system-usuarios system)
                                  (get-system-usuario-conectado system)
                                  (get-system-drive-seleccionado system)
-                                 (cons(make-carpeta (get-posicion system)
+                                 (cons(make-carpeta (string-downcase(get-posicion system))
                                                     (car(reverse(string-split(get-posicion system)"/")))
                                                     (get-system-usuario-conectado system)
                                                     (remove-titulo filename system))           
@@ -281,44 +283,201 @@ Una carpeta se puede eliminar estando posicionado fuera de ésta.|#
                       (get-system-usuario-conectado system)
                       (get-system-drive-seleccionado system)
                       (get-system-ruta system))))))
-                 
-                 #|(make-system(get-system-name system) ;si no son nulos los archivos, no se puede borrar la carpeta
-                             (get-system-drive system)
-                             (get-system-usuarios system)
-                             (get-system-usuario-conectado system)
-                             (get-system-drive-seleccionado system)
-                             (get-system-ruta system))))
-          
-          (make-system(get-system-name system) ;si no son nulos los archivos, no se puede borrar la carpeta
-                      (get-system-drive system)
-                      (get-system-usuarios system)
-                      (get-system-usuario-conectado system)
-                      (get-system-drive-seleccionado system)
-                      (get-system-ruta system))))))|#
-             
- #|            ;HAY QUE HACERLE MAP APRA QUE FUNCIONE (member foldername (string-split (get-posicion system)"/")) 
-          ;si el nombre es string, existe la carpeta en el sistema, es miembro de la ruta actual y es nulo
-          (make-system(get-system-name system)
-                      (get-system-drive system)
-                      (get-system-usuarios system)
-                      (get-system-usuario-conectado system)
-                      (get-system-drive-seleccionado system)
-                      (remove-posicion foldername system))
-          
-          (make-system(get-system-name system);en parte funciona pq no borra folder1 cuando tiene archivos
-                      (get-system-drive system)
-                      (get-system-usuarios system)
-                      (get-system-usuario-conectado system)
-                      (get-system-drive-seleccionado system)
-                      (get-system-ruta system))))))|#
-          
 
-#|FUNCION 14
+#|FUNCION 14 copy
 DOMINIO: system X source (file or folder) (String) x target path (String)
 RECORRIDO: system
 RECURSION: NOC
 DESCRIPCION:función para copiar un archivo o carpeta desde una ruta origen a una ruta destino.|#
 
+(define copy ; no debe eliminar los archivos
+  (lambda(system)
+    (lambda(source target)
+      ;AGREGAR QUE SE PUEDE HACER SOLO SI LA ULTIMA POSICION DE LOS ARCHIVOS NO SEA VACIA
+      (if(and(is-string source)(is-string target))    ;si es miembro el ultimo elemento del path en las carpetas creadas y existe el archivo en los archivos
+         (if (and(member(car(reverse(string-split target "/"))) (map cadr (get-system-ruta system))) (member source (map car(get-files system))))
+             (make-system(get-system-name system)
+                         (get-system-drive system)
+                         (get-system-usuarios system)
+                         (get-system-usuario-conectado system)
+                         (get-system-drive-seleccionado system)
+                         (cons(make-carpeta (string-downcase target) 
+                                            (car(reverse(string-split target "/")))
+                                            (get-system-usuario-conectado system)
+                                            (no-remove-archivo source system))     ;EL ARCHIVO DEBE IR CON TODAS SUS PROPIEDADES       
+                              (get-system-ruta system)))
+             
+             (if (and(member source (map cadr (get-system-ruta system))) (member (car(string-split target ":/")) (map string(map car(get-system-drive system))))) ;MIEMBRO LAS CARPETAS Y EL DRIVE, PARA EL CASO DE LAS CARPETAS Y DRIVES
+                 (make-system(get-system-name system)
+                             (get-system-drive system)
+                             (get-system-usuarios system)
+                             (get-system-usuario-conectado system)
+                             (get-system-drive-seleccionado system)
+                             (cons(make-carpeta (string-downcase(string-append target source "/")) 
+                                                source ;DUEÑO DE FOLDER1, O LO QUE ENTRE
+                                                (get-system-usuario-conectado system)
+                                                (rec-archivos source system))      ;EL ARCHIVO DEBE IR CON TODAS SUS PROPIEDADES       
+                                                (get-system-ruta system)))
+                 
+                 (make-system(get-system-name system) ;en caso contrario solo lo mantiene
+                             (get-system-drive system) 
+                             (get-system-usuarios system)
+                             (get-system-usuario-conectado system)
+                             (get-system-drive-seleccionado system)
+                             (get-system-ruta system))))
+         
+         (make-system(get-system-name system) ;en caso contrario solo lo mantiene
+                     (get-system-drive system) 
+                     (get-system-usuarios system)
+                     (get-system-usuario-conectado system)
+                     (get-system-drive-seleccionado system)
+                     (get-system-ruta system))))))
+      
+;source target
+;(define S46 ((run S35 copy) "foo1.txt" "C:/folder3/"))
+;(define S47 ((run S46 cd) ".."))
+;(define S48 ((run S47 copy) "folder1" "D:/"))
+
+#|FUNCION 15 MOVE
+DOMINIO:system X source (file or folder) (String) x target path (String)
+RECORRIDO: system
+RECURSION: NO
+DESCRIPCION:función para mover un archivo o carpeta desde una ruta origen a una ruta destino.
+La operación de mover elimina el contenido desde la ruta origen.|#
+
+(define move
+  (lambda(system)
+    (lambda(source target)
+      (if(and(is-string source)(is-string target))
+        ;caso de que source es una carpeta y target es una letra de ruta. si existe la carpeta y la letra a la que va existe en los drives existentes
+         (if(and(member source (map cadr (get-system-ruta system)))(member (car(string-split target ":/")) (map string(map car(get-system-drive system)))))
+
+            (make-system(get-system-name system)
+                        (get-system-drive system)
+                        (get-system-usuarios system)
+                        (get-system-usuario-conectado system)
+                        (get-system-drive-seleccionado system)
+                        (cons(make-carpeta (string-downcase(string-append target source "/"))
+                                           source ;DUEÑO DE FOLDER1, O LO QUE ENTRE
+                                           (get-system-usuario-conectado system)
+                                           (rec-archivos source system))      ;EL ARCHIVO DEBE IR CON TODAS SUS PROPIEDADES       
+                             (remove-carpeta-drive source target system)))
+            
+         (if(and(member (car(reverse(string-split target "/"))) (map cadr (get-system-ruta system)))(member target (map car (get-system-ruta system))))
+
+            (make-system(get-system-name system)
+                        (get-system-drive system)
+                        (get-system-usuarios system)
+                        (get-system-usuario-conectado system)
+                        (get-system-drive-seleccionado system)
+                        (cons(make-carpeta (string-downcase target)
+                                           (car(reverse(string-split target "/"))) ;DUEÑO DE FOLDER1, O LO QUE ENTRE
+                                           (get-system-usuario-conectado system)
+                                           (append(rec-archivos (car(reverse(string-split target "/"))) system) (no-remove-archivo source system))) ;EL ARCHIVO DEBE IR CON TODAS SUS PROPIEDADES       
+                             '()))
+             
+             (make-system(get-system-name system) ;en caso contrario solo lo mantiene
+                         (get-system-drive system) 
+                         (get-system-usuarios system)
+                         (get-system-usuario-conectado system)
+                         (get-system-drive-seleccionado system)
+                         (get-system-ruta system))))
+         ;si la carpeta en la que se quiera agregar es miembro del string posicion de la ultima actualizacion del sistema, se recrea la lista con ella adelante y solo la raiz
+            
+         (make-system(get-system-name system) ;en caso contrario solo lo mantiene
+                     (get-system-drive system) 
+                     (get-system-usuarios system)
+                     (get-system-usuario-conectado system)
+                     (get-system-drive-seleccionado system)
+                     (get-system-ruta system))))))
+
+
+;CAPA MODIFICADORA
+(define posicion-split
+  (lambda (x)
+    (string-split x "/")))
+
+;moviendo carpetas y archivos
+                ;source target
+;(define S49 ((run S48 move) "folder3" "D:/")) ;La carpeta 3 se mueve con su copia, no se debe borrar el archivo que contiene pues solo contiene una copia y no el original
+;(define S50 ((run S49 cd) "folder1")) ;PUEDE ABRIR FOLDER1 EN D O C PERO COMO ESTOY EN D SE ABRE AHI
+;(define S51 ((run S50 move) "foo3.docx" "D:/folder3/")) 
+
+#|FUNCION 16 REN (RENAME)
+DOMINIO:system XcurrentName (String) X newName (String)
+RECORRIDO:system
+RECURSION: no
+DESCRIPCION:función para renombrar una carpeta o archivo,
+siempre y cuando el nuevo nombre no viole la restricción de unicidad dentro del mismo nivel.|#
+(define ren
+  (lambda (system)
+    (lambda(name new-name)
+      (if(and(is-string name)(is-string new-name))
+         ;el caso de cambiar el nmbre a un archivo de texto
+         ;solo tomare en cuenta si existe en la ultima actualizacion de archivos
+         ;si existe el nombre en los archivos y si no existe el nuevo nombre en los archivos(tratando de evitar las duplicas)
+;Caso nombre archivos
+         (if (and (member name (map car(caddr(recuperar-ruta system))))
+                  (not(member new-name (map car(caddr(recuperar-ruta system))))))
+             (make-system(get-system-name system)
+                         (get-system-drive system)
+                         (get-system-usuarios system)
+                         (get-system-usuario-conectado system)
+                         (get-system-drive-seleccionado system)
+                         (cons(make-carpeta (string-downcase(car(recuperar-ruta system)))
+                                                    (car(reverse(string-split (car(recuperar-ruta system)) "/")))
+                                                    (get-system-usuario-conectado system)
+                                                    (cambia-nombre-archivo system name new-name))           
+                                            (get-system-ruta system)))
+             
+                 ;Caso de carpetas, tiene que estar fuera de la carpeta para poder cambiarle el nombre
+             ;por lo tanto, el ultimo elemento de posicion debe cambiar
+         (if (and(member name (map cadr (get-system-ruta system)))
+                  (not(member new-name (map cadr (get-system-ruta system))))) ;no debe existir previamente en cualquier posicion
+
+             (make-system(get-system-name system)
+                         (get-system-drive system)
+                         (get-system-usuarios system)
+                         (get-system-usuario-conectado system)
+                         (get-system-drive-seleccionado system)
+                         (cons(make-carpeta (string-downcase(string-append(string-append (get-posicion system) new-name)"/")) 
+                                            new-name
+                                            (get-system-usuario-conectado system)
+                                            (rec-archivos name system))           
+                              (get-system-ruta system)))
+             
+             (make-system(get-system-name system) ;en caso contrario solo lo mantiene
+                         (get-system-drive system) 
+                         (get-system-usuarios system)
+                         (get-system-usuario-conectado system)
+                         (get-system-drive-seleccionado system)
+                         (get-system-ruta system))))
+         #f))))
+
+;capa modificadora
+    (define (cambia-nombre-archivo system name new-name)
+      (cons(car(remove-titulo2 name system)) (list(cons new-name (remove name (car(no-remove-archivo2 name system)))))))
+
+;capa selectora, funciona recuperando la ruta que se perdio por move o copy
+(define (remove-titulo2 filename system) 
+      (filter (lambda(x) (if (not(equal? filename (car x)))
+                            #t
+                            #f))
+              (caddr(recuperar-ruta system))))
+
+;capa
+(define (no-remove-archivo2 file system)
+      (filter (lambda(x)(if (equal? file (car x))
+                            #t
+                            #f))
+              (caddr(recuperar-ruta system))))
+
+
+;renombrando carpetas y archivos
+;(define S52 ((run S51 ren) "foo1.txt" "newFoo1.txt"))
+;(define S53 ((run S52 ren) "foo2.txt" "newFoo1.txt")) ;no debería efectuar cambios pues ya existe archivo con este nombre
+;(define S54 ((run S53 cd) ".."))
+;(define S55 ((run S54 ren) "folder1" "newFolder1"))
 
 
 
@@ -326,10 +485,20 @@ DESCRIPCION:función para copiar un archivo o carpeta desde una ruta origen a un
 
 
 
+                                                                               
 
-
-
-
+;capa selectora, recupero la ultima ruta de mi drive actual luego de los cambios
+;lo necesito para ren pq no se cambian los nombres en cualquier drive, sino en el actual
+(define (recuperar-ruta system)
+  (if (null? (filter(lambda (x) (if(equal? (string-downcase(get-system-drive-seleccionado system)) (car(string-split (car x) "/")))
+                                   #t
+                                   #f))
+                    (get-system-ruta system)))
+      null
+      (car(filter(lambda (x) (if(equal? (string-downcase(get-system-drive-seleccionado system)) (car(string-split (car x) "/")))
+                                   #t
+                                   #f))
+                    (get-system-ruta system)))))
 
 #|FUNCION 18 FORMAT
 DOMINIO:system X letter (char) X name (String)
@@ -354,7 +523,7 @@ además de indicar nuevo nombre, pero conservando capacidad.
 
 
 ;capa selectora, la pude hacer en la funcion pero me costo el filter. saca los elementos de la lista que tienen la misma primera letra en el primer elemento
-(define (remove letter system)
+(define (remove1 letter system)
       (filter (lambda(x)(if (not(equal?(string-append(string letter)":") (car(string-split (car x) "/"))))
                             #t
                             #f))
@@ -383,6 +552,17 @@ además de indicar nuevo nombre, pero conservando capacidad.
               (get-files system)))
 
 
+;capa selectora, borra los nombres de los archivos que han sido movidos a otro drive, los borra de la ruta del drive anterior
+(define (remove-titulo-ruta filename target system) 
+  (filter (lambda(x) (if(not(null? (cadr x)))       ;D |EL OTRO DEBERIA QUE SER C
+                        (if(not(and(member filename (map car (caddr x))) (not(member (string-downcase(car(string-split target "/"))) (string-split (car x) "/")))))
+                              #t
+                              #f)
+                        #f))
+              (get-system-ruta system))) ;"goo4.docx" ;borro goo4
+
+
+    
 ;Capa selectora elimina todas las existencias de la carpeta de la ruta (el string / /)
 (define (remove-posicion file system)
   (filter (lambda(x) (if (not(or(equal? file (car(reverse(string-split (car x) "/")))) (equal? file (cadr x))))
@@ -411,8 +591,16 @@ además de indicar nuevo nombre, pero conservando capacidad.
                                            #f))
                              (get-system-ruta system))))))))
 
+;capa selectora, remueve la carpeta del drive anterior, dejando solo en el drive al que se ha movido, recordar los archivos que tenia
+(define (remove-carpeta-drive source target system)
+      (filter (lambda(x) (if (and(not(equal? source (cadr x)))) ;borra los archivos igual al que entra                      ;(not(equal? (string-append target ":/") (car(string-split(car x)"/"))))) 
+                         #t
+                         #f))
+          (get-system-ruta system)))
 
-    
+
+;(flatten (list (list 1 2 3 4 "caca") (list "caca" "caci" "caoca")))
+;'(1 2 3 4 "caca" "caca" "caci" "caoca")
 
 ;capa selectora, encuentra el drive con la misma letra para sacar propiedades/capacidad
 (define (no-remove letter system)
@@ -421,6 +609,12 @@ además de indicar nuevo nombre, pero conservando capacidad.
                             #f))
               (get-system-drive system)))
 
+;capa selectora, me devuelve los archivos que tengan el mismo nombre para moverlos; no pueden haber dos archivos con el mismo nombre
+(define (no-remove-archivo file system)
+      (filter (lambda(x)(if (equal? file (car x))
+                            #t
+                            #f))
+              (get-files system)))
 
 ;capa modificadora obtener capacidad
 (define (capacidad letter system nombre)
@@ -432,7 +626,7 @@ además de indicar nuevo nombre, pero conservando capacidad.
                       (get-system-usuarios system)
                       (get-system-usuario-conectado system)
                       (get-system-drive-seleccionado system)
-                      (remove letter system))
+                      (remove1 letter system))
           #f)
       #f))
               
@@ -468,7 +662,8 @@ además de indicar nuevo nombre, pero conservando capacidad.
 
 ;vuelve a la raíz de la unidad c:/
 (define S26 ((run S25 cd) "/")) ;funciona 16-04-23
-      
+
+
 #|S13
 S14
 S15
@@ -521,8 +716,21 @@ S26 ;todo bem|#
 (define S45 ((run S44 rd) "folder1")) ;FUNCIONA 20-04
 
 
+;copiando carpetas y archivos
+(define S46 ((run S35 copy) "foo1.txt" "C:/folder3/"))
+(define S47 ((run S46 cd) ".."))
+(define S48 ((run S47 copy) "folder1" "D:/"))
 
 
+;moviendo carpetas y archivos
+(define S49 ((run S48 move) "folder3" "D:/")) ;SE BORRA FOLDER3 DE C Y EL REGISTRO
+(define S50 ((run S49 cd) "folder1")) ;DEBERIA MOVERSE EN C
+(define S51 ((run S50 move) "foo3.docx" "D:/folder3/")) ;50% NO PUEDO RECUPERAR QUE ESTÉN PUESTOS DESPUES DEL QUE DEBO ELIMINAR
+
+(define S52 ((run S51 ren) "foo1.txt" "newFoo1.txt"))
+(define S53 ((run S52 ren) "foo2.txt" "newFoo1.txt")) ;no debería efectuar cambios pues ya existe archivo con este nombre
+(define S54 ((run S53 cd) ".."))
+(define S55 ((run S54 ren) "folder1" "newFolder1"))
       
 #|S27
 S28
@@ -542,7 +750,14 @@ S41
 S42
 S43
 S44
-S45|#
+S45
+S46
+S47
+S48|#
+
+
+
+
 
 ;(make-carpeta (string-append (string(car(get-system-drive-seleccionado system)))":/") (append(crear-ruta path)(filter (lambda (x) (eq? (cadr x) path))(get-system-ruta system))) (get-system-usuario-conectado system))
 ;                         (get-system-ruta system))) ;si está en el resto de lugares no se agrega
