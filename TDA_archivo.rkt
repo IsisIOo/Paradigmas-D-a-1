@@ -2,24 +2,14 @@
 ;TDA ARCHIVO/CARPETA
 (require "TDA_SYSTEM_CONSTRUCTOR.rkt")
 (require "tda_usuario.rkt")
+(require "funciones_archivos_carpetas.rkt")
 
-;capa constructora, paso 1 para crear el camino
-(define (carpeta string)
-    (if(is-string string)
-       (make-carpeta null null null null null null)
-       #f))
-
-(define (files string)
-  (list string null null))
 
 ;IMPORTANTE
 ;(string #\D)
 
-;capa selectora
-(define get-posicion (lambda(system) (car(car(car(cdr(cdr(cdr(cdr(cdr system))))))))))
-(define get-my-string-posicion (lambda (system) (car(car(get-system-ruta system))))) ;obtiene el string de la ultima ruta utilizada
-(define get-files (lambda (system) (car(cdr(cdr(car(get-system-ruta system)))))))
-(define get-carpetas (lambda (system) (car(cdr(car(get-system-ruta system))))))
+(define (files string)
+  (list string null null))
 
 #|FUNCION 9 md
 DOMINIO: system X name (String) 
@@ -62,13 +52,13 @@ la unidad respectivamente.|#
   (lambda(system)
     (lambda (path)
       (if (is-string path)
-          (if(and(member path (map cadr(get-system-ruta system)))(not(member (string-downcase path) (string-split(string-downcase(get-posicion system))"/"))))
+          (if(and(member (string-downcase path) (map cadr(get-system-ruta system)))(not(member (string-downcase path) (string-split(string-downcase(get-posicion system))"/"))))
              (make-system(get-system-name system) ;si existe la carpeta y no está abierto en la ruta, le deja entrar, recupera los archivos que tenia por ultima vez
                          (get-system-drive system)
                          (get-system-usuarios system)
                          (get-system-usuario-conectado system)
                          (get-system-drive-seleccionado system)
-                         (cons(make-carpeta (string-downcase(string-append (get-posicion system) path "/"))
+                         (cons(make-carpeta (string-downcase(string-append (car(recuperar-ruta system)) path "/"))
                                             null
                                             (get-system-usuario-conectado system)
                                             (rec-archivos path system))
@@ -102,7 +92,7 @@ la unidad respectivamente.|#
                                    (get-system-drive system)
                                    (get-system-usuarios system)
                                    (get-system-usuario-conectado system)
-                                   (car(string-split path "/"))
+                                   (string->list(string-upcase(string(car(string->list(car(string-split path "/")))))))
                                    (cons(make-carpeta (string-downcase path)
                                                       null
                                                       (get-system-usuario-conectado system)
@@ -122,8 +112,6 @@ la unidad respectivamente.|#
                       (get-system-usuario-conectado system)
                       (get-system-drive-seleccionado system)
                       (get-system-ruta system))))))
-;le puse para que todos recuperen sus respectivos archivos            
-
 
 #|FUNCION 11  TDA system - add-file
 DOMINIO:system X file
@@ -155,15 +143,6 @@ DESCRIPCION:función que permite añadir un archivo en la ruta actual.
       
       
       
-;capa constructora crea la list que contendrá los elementos del file
-(define (make-file nombre ext cont rest) ;rest = atr1 atr2
-  (list nombre ext cont rest))
-
-;capa constructora, crea una variable del mismo nombre que lo que entra en la funcion para que lo que entregue se transforme en lista y sea trabajado como lista
-(define file ;como makedrive
-  (lambda (nombre ext cont . rest)
-    (make-file nombre ext cont rest)))
-    
 #|TDA FUNCION 12 DEL
 DOMINIO:system X fileName or fileNamePattern (string)
 RECORRIDO: system
@@ -172,7 +151,6 @@ DESCRIPCION: función para eliminar un archivo o varios archivos en base a un pa
 Esta versión también puede eliminar una carpeta completa con todos sus subdirectorios.
 El contenido eliminado se va a la papelera.
 |#
-;(equal? (car(string->list "foo1.txt")) #\f)
 
 (define del
   (lambda (system)
@@ -333,10 +311,6 @@ DESCRIPCION:función para copiar un archivo o carpeta desde una ruta origen a un
                      (get-system-drive-seleccionado system)
                      (get-system-ruta system))))))
       
-;source target
-;(define S46 ((run S35 copy) "foo1.txt" "C:/folder3/"))
-;(define S47 ((run S46 cd) ".."))
-;(define S48 ((run S47 copy) "folder1" "D:/"))
 
 #|FUNCION 15 MOVE
 DOMINIO:system X source (file or folder) (String) x target path (String)
@@ -391,18 +365,6 @@ La operación de mover elimina el contenido desde la ruta origen.|#
                      (get-system-drive-seleccionado system)
                      (get-system-ruta system))))))
 
-
-;CAPA MODIFICADORA
-(define posicion-split
-  (lambda (x)
-    (string-split x "/")))
-
-;moviendo carpetas y archivos
-                ;source target
-;(define S49 ((run S48 move) "folder3" "D:/")) ;La carpeta 3 se mueve con su copia, no se debe borrar el archivo que contiene pues solo contiene una copia y no el original
-;(define S50 ((run S49 cd) "folder1")) ;PUEDE ABRIR FOLDER1 EN D O C PERO COMO ESTOY EN D SE ABRE AHI
-;(define S51 ((run S50 move) "foo3.docx" "D:/folder3/")) 
-
 #|FUNCION 16 REN (RENAME)
 DOMINIO:system XcurrentName (String) X newName (String)
 RECORRIDO:system
@@ -454,51 +416,19 @@ siempre y cuando el nuevo nombre no viole la restricción de unicidad dentro del
                          (get-system-ruta system))))
          #f))))
 
-;capa modificadora
-    (define (cambia-nombre-archivo system name new-name)
-      (cons(car(remove-titulo2 name system)) (list(cons new-name (remove name (car(no-remove-archivo2 name system)))))))
 
-;capa selectora, funciona recuperando la ruta que se perdio por move o copy
-(define (remove-titulo2 filename system) 
-      (filter (lambda(x) (if (not(equal? filename (car x)))
-                            #t
-                            #f))
-              (caddr(recuperar-ruta system))))
-
-;capa
-(define (no-remove-archivo2 file system)
-      (filter (lambda(x)(if (equal? file (car x))
-                            #t
-                            #f))
-              (caddr(recuperar-ruta system))))
-
-
-;renombrando carpetas y archivos
-;(define S52 ((run S51 ren) "foo1.txt" "newFoo1.txt"))
-;(define S53 ((run S52 ren) "foo2.txt" "newFoo1.txt")) ;no debería efectuar cambios pues ya existe archivo con este nombre
-;(define S54 ((run S53 cd) ".."))
-;(define S55 ((run S54 ren) "folder1" "newFolder1"))
+#|FUNCION 17 DIR
+DOMINIO: system X params (String list)
+RECORRIDO: string (formateado para poder visualizarlo con display)
+RECURSION: SI 
+DESCRIPCION:función para listar el contenido de un directorio específico o de toda una ruta,
+lo que se determina mediante parámetros.
+|#
 
 
 
 
-
-
-
-                                                                               
-
-;capa selectora, recupero la ultima ruta de mi drive actual luego de los cambios
-;lo necesito para ren pq no se cambian los nombres en cualquier drive, sino en el actual
-(define (recuperar-ruta system)
-  (if (null? (filter(lambda (x) (if(equal? (string-downcase(get-system-drive-seleccionado system)) (car(string-split (car x) "/")))
-                                   #t
-                                   #f))
-                    (get-system-ruta system)))
-      null
-      (car(filter(lambda (x) (if(equal? (string-downcase(get-system-drive-seleccionado system)) (car(string-split (car x) "/")))
-                                   #t
-                                   #f))
-                    (get-system-ruta system)))))
+                                                                             
 
 #|FUNCION 18 FORMAT
 DOMINIO:system X letter (char) X name (String)
@@ -522,35 +452,6 @@ además de indicar nuevo nombre, pero conservando capacidad.
 
 
 
-;capa selectora, la pude hacer en la funcion pero me costo el filter. saca los elementos de la lista que tienen la misma primera letra en el primer elemento
-(define (remove1 letter system)
-      (filter (lambda(x)(if (not(equal?(string-append(string letter)":") (car(string-split (car x) "/"))))
-                            #t
-                            #f))
-              (get-system-ruta system)))
-
-
-;capa selectora elimina los drives que tengan la misma letra de primer elemento que la letra que entra, lo hace en un lugar diferente que el de arriba
-(define (remove2 letter system) 
-      (filter (lambda(x)(if (not(equal? letter  (car x)))
-                            #t
-                            #f))
-              (get-system-drive system)))
-
-;CAPA SELECTORA REMOVE 3, HARA LO MISMO QUE REMOVE 2 SOLO QUE CON OTRA PARTE DEL SYSTEM
-(define (remove-extension filename system) 
-      (filter (lambda(x) (if (not(equal? filename (cadr x)))
-                            #t
-                            #f))
-              (get-files system)))
-  
-;capa selectora, REMUEVE LOS QUE TENGAN EL MISMO TITULO, ME PERDI CON TANTO FILTRO PERO ALGUNO DEBE SER PARECIDO
-(define (remove-titulo filename system) 
-      (filter (lambda(x) (if (not(equal? filename (car x)))
-                            #t
-                            #f))
-              (get-files system)))
-
 
 ;capa selectora, borra los nombres de los archivos que han sido movidos a otro drive, los borra de la ruta del drive anterior
 (define (remove-titulo-ruta filename target system) 
@@ -559,77 +460,46 @@ además de indicar nuevo nombre, pero conservando capacidad.
                               #t
                               #f)
                         #f))
-              (get-system-ruta system))) ;"goo4.docx" ;borro goo4
+             (recuperar-listas system))) ;"goo4.docx" ;borro goo4
 
 
-    
-;Capa selectora elimina todas las existencias de la carpeta de la ruta (el string / /)
-(define (remove-posicion file system)
-  (filter (lambda(x) (if (not(or(equal? file (car(reverse(string-split (car x) "/")))) (equal? file (cadr x))))
-                         #t
-                         #f))
-          (get-system-ruta system))) ;FUNCIONA
+
+;define capa selectora
+(define(remove-titulo-del system nombre lista lista1)
+  (if (null? lista)
+      #t
+      (if(member nombre (car(caddr(car lista))))
+                 (remove (car(caddr(car lista)))  lista1)
+                 (remove-titulo-del system nombre (cdr lista) lista1))))
+
+;capa selectora, reune todos los elementos que tengan de raiz la letra c, de la cual quiero borrar el archivo
+(define (recuperar-listas system)
+  (if (null? (filter(lambda (x) (if(equal? (string-append(string(car(get-system-drive-seleccionado system)))":") (string-upcase(car(string-split (car x) "/"))))
+                                   #t
+                                   #f))
+                    (get-system-ruta system)))
+      null
+      (filter(lambda (x) (if(equal?(string-append(string(car(get-system-drive-seleccionado system)))":") (string-upcase(car(string-split (car x) "/"))))
+                                   #t
+                                   #f))
+                    (get-system-ruta system))))
+
+;capa selectora, me recupera los que tienen letra distinta a donde quiero borrar cierto archivo
+(define (no-recuperar-listas system)
+  (if (null? (filter(lambda (x) (if(not(equal? (string-append(string(car(get-system-drive-seleccionado system)))":") (string-upcase(car(string-split (car x) "/")))))
+                                   #t
+                                   #f))
+                    (get-system-ruta system)))
+      null
+      (filter(lambda (x) (if(not(equal?(string-append(string(car(get-system-drive-seleccionado system)))":") (string-upcase(car(string-split (car x) "/")))))
+                                   #t
+                                   #f))
+                    (get-system-ruta system))))
 
 
-;CAPA SELECTORA, necesito que me haga lista de los titulos de cada file
-(define (letter-titles filename system) 
-   (filter (lambda(x) (if(not(and(equal? (car(string-split filename "*")) (string(car(string->list(car x)))))
-                                 (equal? (car(string-split (cadr(string-split filename "*")) ".")) (car(cdr x)))))
-                    #t
-                   #f))
-       (get-files system)))
-
-;capa selectora, trata de recuperar los archivos que habia dentro de una carpeta
-(define (rec-archivos path system)
-  (if(null? (filter(lambda(x) (if(equal? path (cadr x))
-                                 #t
-                                 #f))
-                   (get-system-ruta system)))
-     null
-     (car(cdr(cdr(car(filter (lambda(x) (if(equal? path (cadr x))                     
-                                           #t
-                                           #f))
-                             (get-system-ruta system))))))))
-
-;capa selectora, remueve la carpeta del drive anterior, dejando solo en el drive al que se ha movido, recordar los archivos que tenia
-(define (remove-carpeta-drive source target system)
-      (filter (lambda(x) (if (and(not(equal? source (cadr x)))) ;borra los archivos igual al que entra                      ;(not(equal? (string-append target ":/") (car(string-split(car x)"/"))))) 
-                         #t
-                         #f))
-          (get-system-ruta system)))
 
 
-;(flatten (list (list 1 2 3 4 "caca") (list "caca" "caci" "caoca")))
-;'(1 2 3 4 "caca" "caca" "caci" "caoca")
 
-;capa selectora, encuentra el drive con la misma letra para sacar propiedades/capacidad
-(define (no-remove letter system)
-      (filter (lambda(x)(if (equal? letter (car x))
-                            #t
-                            #f))
-              (get-system-drive system)))
-
-;capa selectora, me devuelve los archivos que tengan el mismo nombre para moverlos; no pueden haber dos archivos con el mismo nombre
-(define (no-remove-archivo file system)
-      (filter (lambda(x)(if (equal? file (car x))
-                            #t
-                            #f))
-              (get-files system)))
-
-;capa modificadora obtener capacidad
-(define (capacidad letter system nombre)
-  (if (and(is-string nombre)(is-char letter))
-      (if (member letter (map car(get-system-drive system)))
-          ;(map caddr (get-system-drive S30)) capacidades
-          (make-system(get-system-name system);verdadero
-                      (cons(make-drive letter nombre (car (cdr (cdr (car(no-remove letter system))))))(remove2 letter system))
-                      (get-system-usuarios system)
-                      (get-system-usuario-conectado system)
-                      (get-system-drive-seleccionado system)
-                      (remove1 letter system))
-          #f)
-      #f))
-              
 
 
 
