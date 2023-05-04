@@ -34,9 +34,8 @@ DOMINIO: system X nombre(string) X nuevo nombre (string)
 RECORRIDO: archivo llamado nombre renombrado como nuevo nombre
 RECURSION: no
 DESCRIPCION: remueve el nombre previo del archivo y luego de hacerlo le agrega nuevo nombre a la lista del archivo|#
-
-    (define (cambia-nombre-archivo system name new-name)
-      (cons(car(remove-titulo2 name system)) (list(cons new-name (remove name (car(no-remove-archivo2 name system)))))))
+(define (cambia-nombre-archivo system name new-name)
+  (append(remove-titulo2 name system) (list(cons new-name (remove name (car(no-remove-archivo2 name system)))))))
 
 #|capacidad
 DOMINIO: filename (string) X system
@@ -45,10 +44,9 @@ RECURSION: no
 DESCRIPCION: funcion que crea el drive con nombre cambiado y utilizando la funcion no-remove para poder
  obtener la capacidad del drive previo, crea el nuevo sistema con el cambio en los drives|#
 
-(define (capacidad letter system nombre)
+(define (set-capacidad letter system nombre)
   (if (and(is-string nombre)(is-char letter))
       (if (member letter (map car(get-system-drive system)))
-          ;(map caddr (get-system-drive S30)) capacidades
           (make-system(get-system-name system);verdadero
                       (cons(make-drive letter nombre (car (cdr (cdr (car(no-remove letter system))))))(remove2 letter system))
                       (get-system-usuarios system)
@@ -81,6 +79,12 @@ RECURSION: no
 DESCRIPCION: obtiene la carpeta que ha sido creada o el dueño de los archivos
 (depende de la funcion que se le haya aplicado) en md es carpeta creada, en move, copy, add-file es el dueño del archivo|#
 (define get-carpetas (lambda (system) (car(cdr(car(get-system-ruta system))))))
+
+
+
+(define get-password (lambda (system) (car(cdr(cdr(cdr(cdr(car(get-system-ruta system)))))))))
+
+
 
 #|remove-titulo2 
 DOMINIO: nombre del archivo (string) X system

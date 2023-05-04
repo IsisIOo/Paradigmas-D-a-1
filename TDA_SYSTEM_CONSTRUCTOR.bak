@@ -75,11 +75,10 @@ RECORRIDO: system
 DESCRIPCION: Función que permite añadir una unidad a un
 sistema. La letra de la unidad es única.
 RECURSION: no
-
 |#
 ;capa constructora
-(define (make-carpeta drive string user file) ;el primer elemento es la ruta con la letra, segundo elemento lo ultimo agregado, tercer user, 4to documento 5to, tipo de doc, usuario
-  (list drive string file (current-seconds))) ;este current seconds es la fecha de modificacion, aunque no se como mantenerlo fijo
+(define (make-carpeta ruta string user file) ;el primer elemento es la ruta con la letra, segundo elemento lo ultimo agregado, tercer user, 4to documento 5to, tipo de doc, usuario
+  (list ruta string file user (current-seconds))) ;este current seconds es la fecha de modificacion, aunque no se como mantenerlo fijo
 
 
 ;capa constructora crea la estructura drive
@@ -89,16 +88,17 @@ RECURSION: no
 (define add-drive
   (lambda(system)
     (lambda (letter name capacity);info del drive
-      (if(member letter (map car(get-system-drive system)))
+      (if(and (member letter (map car(get-system-drive system)))(integer? capacity)(is-string name))
          (make-system(get-system-name system) ;lo mantiene
                      (get-system-drive system) 
                      (get-system-usuarios system)
                      (get-system-usuario-conectado system)
                      (get-system-drive-seleccionado system)
                      (get-system-ruta system))
+         
          (make-system (get-system-name system)
                       (cons(make-drive letter name capacity) ;;make-drive= lista que recibe 3 cosas, y le agrega algo adelante de 3 cosas
-                      (get-system-drive system)) ;cadr de la lista system, system =lista
+                           (get-system-drive system)) ;cadr de la lista system, system =lista
                       (get-system-usuarios system)
                       (get-system-usuario-conectado system)
                       (get-system-drive-seleccionado system)
@@ -112,7 +112,7 @@ RECORRIDO: system
 DESCRIPCION: Permite fijar la unidad en la que el usuario
 realizará acciones. La función solo debe funcionar cuando hay un usuario con sesión
 iniciada en el sistema
-RECURSION: no sé|#
+RECURSION: no|#
 
 (define switch-drive
   (lambda(system)
@@ -123,13 +123,14 @@ RECURSION: no sé|#
                       (get-system-usuarios system)
                       (get-system-usuario-conectado system)
                       (if (null?(get-system-drive-seleccionado system))
-                          (cons letter(get-system-drive-seleccionado system)) ;verdaderp
-                          (if(equal? letter (car(get-system-drive-seleccionado system))) ;falso
+                          (cons letter (get-system-drive-seleccionado system)) ;verdaderp
+                          (if(equal?  letter (car(get-system-drive-seleccionado system))) ;falso
                              (get-system-drive-seleccionado system) ;v
                              (cons letter null)))
-                      (cons(make-carpeta (string-append (string-downcase(string letter)":/"))
-                                         (cons letter null)
-                                         (get-system-usuario-conectado system)
+                      
+                      (cons(make-carpeta (string-downcase(string-append (string letter)":/"))
+                                         '()
+                                         (car(get-system-usuario-conectado system))
                                          '()) (get-system-ruta system)))
          
          (make-system(get-system-name system) ;en caso contrario solo lo mantiene
@@ -143,22 +144,16 @@ RECURSION: no sé|#
 ;capa pertenencia verificar si letter es char
          
 
-;ejemplos
+
+;creando un sistema
 (define S0 (system "newSystem"))
-S0
 
+;añadiendo unidades. Incluye caso S2 que intenta añadir unidad con una letra que ya existe
 (define S1 ((run S0 add-drive) #\C "SO" 1000))
-;(define S2 ((run S1 add-drive) #\C "SO1" 3000))
-(define S2 ((run S1 add-drive) #\D "Util" 2000))
-S1
-;S2
-S2
+(define S2 ((run S1 add-drive) #\C "SO1" 3000))
+(define S3 ((run S2 add-drive) #\D "Util" 2000))
 
-;(define S11 ((run S2 switch-drive) #\K)) si no hubiera dispplay funcionaria, o sea, funciona pero tira error y no deja avanzar a las que siguen
-(define S12 ((run S2 switch-drive) #\C))
-S12
-(define S13 ((run S12 switch-drive) #\D))
-S13
+
 
 ;((remove letter(string->list(car(get-system-drive-seleccionado system))) (cons letter(get-system-drive-seleccionado system))))) ;f
 
