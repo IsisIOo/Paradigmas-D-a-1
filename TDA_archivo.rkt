@@ -4,13 +4,6 @@
 (require "tda_usuario.rkt")
 (require "funciones_archivos_carpetas.rkt")
 
-
-;IMPORTANTE
-;(string #\D)
-
-(define (files string)
-  (list string null null))
-
 #|FUNCION 9 md
 DOMINIO: system X name (String) 
 RECORRIDO: SYSTEM
@@ -22,7 +15,7 @@ modificación y atributos de seguridad como los señalados en el enunciado gener
 (define md
   (lambda(system)
     (lambda(nombre)
-      (if(and(is-string nombre)(not(member nombre (map cadr (get-system-ruta system))))) ;si el nombre es string y no existe aun en la lista de carpetas, lo deja crearse
+      (if(and(is-string nombre)(not(member nombre (map cadr (get-system-ruta system))))(not(null? (get-system-usuario-conectado system)))) ;si el nombre es string y no existe aun en la lista de carpetas, lo deja crearse
          (make-system(get-system-name system);verdadero
                      (get-system-drive system)
                      (get-system-usuarios system)
@@ -54,7 +47,7 @@ la unidad respectivamente.|#
 (define cd
   (lambda(system)
     (lambda (path)
-      (if (is-string path)
+      (if (and(is-string path)(not(null? (get-system-usuario-conectado system))))
           (if(and(member (string-downcase path) (map cadr(get-system-ruta system)))(not(member (string-downcase path) (string-split(string-downcase(get-posicion system))"/"))))
              (make-system(get-system-name system) ;si existe la carpeta y no está abierto en la ruta, le deja entrar, recupera los archivos que tenia por ultima vez
                          (get-system-drive system)
@@ -130,7 +123,7 @@ DESCRIPCION:función que permite añadir un archivo en la ruta actual.
 (define add-file
   (lambda(system)
     (lambda(file)
-      (if (map is-string (list file))
+      (if (and(map is-string (list file))(not(null? (get-system-usuario-conectado system))))
           (make-system(get-system-name system)
                       (get-system-drive system)
                       (get-system-usuarios system)
@@ -164,7 +157,7 @@ El contenido eliminado se va a la papelera.
 (define del
   (lambda (system)
     (lambda (filename)
-      (if(is-string filename)
+      (if(and(is-string filename)(not(null? (get-system-usuario-conectado system))))
          (if (or(equal? (car(string-split filename "*")) ".txt")(equal? (car(string-split filename "*")) ".docx"))
 
              (make-system(get-system-name system) ;si lo que entra corresponde a lo de arriba, borra los que tienen lo mismo
@@ -252,7 +245,7 @@ Una carpeta se puede eliminar estando posicionado fuera de ésta.|#
 (define rd
   (lambda (system)
     (lambda(foldername)
-      (if (and(is-string foldername)(member foldername (map cadr (get-system-ruta system))))
+      (if (and(is-string foldername)(member foldername (map cadr (get-system-ruta system))) (not(null? (get-system-usuario-conectado system))))
           (if(not(null? (rec-archivos foldername system))) ;si es vacia la union del dueño y los archivos no se hace nada
              (make-system(get-system-name system)
                          (get-system-drive system) ;si no es vacia la ultima version, lo mantiene
@@ -285,7 +278,7 @@ DESCRIPCION:función para copiar un archivo o carpeta desde una ruta origen a un
   (lambda(system)
     (lambda(source target)
       ;AGREGAR QUE SE PUEDE HACER SOLO SI LA ULTIMA POSICION DE LOS ARCHIVOS NO SEA VACIA
-      (if(and(is-string source)(is-string target))    ;si es miembro el ultimo elemento del path en las carpetas creadas y existe el archivo en los archivos
+      (if(and(is-string source)(is-string target)(not(null? (get-system-usuario-conectado system))))    ;si es miembro el ultimo elemento del path en las carpetas creadas y existe el archivo en los archivos
          (if (and(member(car(reverse(string-split target "/"))) (map cadr (get-system-ruta system))) (member source (map car(get-files system))))
              (make-system(get-system-name system)
                          (get-system-drive system)
@@ -337,7 +330,7 @@ La operación de mover elimina el contenido desde la ruta origen.|#
 (define move
   (lambda(system)
     (lambda(source target)
-      (if(and(is-string source)(is-string target))
+      (if(and(is-string source)(is-string target)(not(null? (get-system-usuario-conectado system))))
         ;caso de que source es una carpeta y target es una letra de ruta. si existe la carpeta y la letra a la que va existe en los drives existentes
          (if(and(member source (map cadr (get-system-ruta system)))(member (car(string-split target ":/")) (map string(map car(get-system-drive system)))))
 
@@ -381,36 +374,6 @@ La operación de mover elimina el contenido desde la ruta origen.|#
                      (get-system-usuario-conectado system)
                      (get-system-drive-seleccionado system)
                      (get-system-ruta system))))))
-
-
-;(define S51 ((run S50 move) "foo3.docx" "D:/folder3/"))
-
-#|capa modificadora
-dominio: source x system
-recorrido:system
-recursion: de cola
-descripcion: elimina el archivo original que ha sido movido a otro drive o carpeta|#
-(define eliminar_archivo
-  (lambda(system source)
-    (define DelFile
-      (lambda(lista vacio)
-        (if(null? lista)
-           vacio
-           (if (null? (caddr(car lista)))
-               (DelFile (cdr lista) (append vacio (list (car lista))))
-               (if(and(member source (map car(caddr (car lista))))(equal? (car(string-split(get-posicion system)"/")) (car(string-split (car(car lista)) "/"))))
-                  (DelFile (cdr lista) (append vacio (list(cons (car (car lista))
-                                                           (cons (cadr (car lista))
-                                                                 (cons (filter(lambda (x) (if (not(equal? source (car x)))
-                                                                                              #t
-                                                                                              #f))(caddr(car lista)))
-                                                                       (cons (cadddr(car lista))
-                                                                             (cons (cadddr(cdr (car lista))) '()))))))))
-                  (DelFile (cdr lista) (append vacio (list (car lista)))))))))
-      (DelFile (get-system-ruta system) '())))
-              
-              
-                  
   
 
 #|FUNCION 16 REN (RENAME)
@@ -422,7 +385,7 @@ siempre y cuando el nuevo nombre no viole la restricción de unicidad dentro del
 (define ren
   (lambda (system)
     (lambda(name new-name)
-      (if(and(is-string name)(is-string new-name))
+      (if(and(is-string name)(is-string new-name)(not(null? (get-system-usuario-conectado system))))
          ;el caso de cambiar el nmbre a un archivo de texto
          ;solo tomare en cuenta si existe en la ultima actualizacion de archivos
          ;si existe el nombre en los archivos y si no existe el nuevo nombre en los archivos(tratando de evitar las duplicas)
@@ -484,47 +447,16 @@ lo que se determina mediante parámetros.
 (define dir
   (lambda(system)
     (lambda (entry)
-      (if(equal? entry "") ;entrada nula-caso base, muestra nomas  ;poner en especifcaciones
-         (recursion-system system)
+      (if (not(null? (get-system-usuario-conectado system)))
+       (if(equal? entry "") ;entrada nula-caso base, muestra nomas  ;poner en especifcaciones
+         (recursion-system system) ;no funciona, o sea,funciona pero no es lo que piden
          (if(equal? entry "/s")
             (recursion-system system) ;muestra las carpetas y subcarpetas
             (if(equal? entry "/s /a"); a muestra lo oculto
                (recursion-system-archivos2 system) ;recursion mostrnado carpetas y archivos
-               #f))))))
+               #f)))
+      #f))))
 
-
-;recursion para mostrar las carpetas
-(define (recursion-system system) ;funciona, muestra las carpetas
-  (define (mostrar-directory folders direc)
-    (if(null? folders)
-       direc
-       (mostrar-directory (cdr folders) (string-append direc "-" (car folders) "\n" )))) ;lo mostraré asi pq no me funciona el salto de linea
-  (mostrar-directory (remove-duplicates(remove-nulos system)) ""))
-
-
-
-
-(define (recursion-system-archivos2 system)
-  (define (mostrar-directory2 lista folders direc)
-    (if (null? folders)
-        direc
-        (mostrar-directory2 lista (cdr folders) (string-append direc "-" (car folders) " / " (string-join (map car (rec-archivos (car folders) system)) " " )"\n")))) 
-  (mostrar-directory2 (get-system-ruta system) (remove-duplicates (remove-nulos system)) ""))
-
-    ;entra nulo, punto?
-    
-    
-(define (remove-nulos system)
-  (filter (lambda (x) (not(equal? '() x))) (map cadr (recuperar-listas system))))
-
-
-
-
-
-;(display ((run S55 dir) "/s")) ;muestra carpetas y subcarpetas de la unidad C
-;(display ((run S55 dir) "/s /a")) ;muestra todo el contenido de carpetas y subcarpetas de la unidad C incluyendo archivo oculto goo4.docx
-    
-                                                                             
 
 #|FUNCION 18 FORMAT
 DOMINIO:system X letter (char) X name (String)
@@ -533,11 +465,10 @@ RECURSION: NO
 DESCRIPCION:función para formatear una unidad dada su letra, lo que borra todo su contenido,
 además de indicar nuevo nombre, pero conservando capacidad.
 |#
-
 (define format
   (lambda (system)
     (lambda(letter nombre)
-      (if(and(is-char letter)(is-string nombre))
+      (if(and(is-char letter)(is-string nombre)(not(null? (get-system-usuario-conectado system))))
          (set-capacidad letter system nombre)
          (make-system(get-system-name system);verdadero
                      (get-system-drive system)
@@ -599,48 +530,7 @@ en la metadata de la carpeta y su contenido, para una posterior desencriptación
                       (get-system-usuario-conectado system)
                       (get-system-drive-seleccionado system)
                       (get-system-ruta system))))))
-              
-
-
-
-
-
-
-;(plus-one(car(string-split (car(car(rec-archivos "newFolder1" S55)))"."))) ;titulo
-;(plus-one(car(string-split (caddr(car(rec-archivos "newFolder1" S55)))"."))) ;contenido
-              
-(define encriptar ;encripta el contenido de una carpeta
-  (lambda(system path)
-    (define encriptar2
-      (lambda(lista vacio)
-        (if(null? lista)
-           vacio
-           (if(member path (map cadr (get-system-ruta system)))
-              (encriptar2 (cdr lista) (append vacio (list(cons (string-append(plus-one(car(string-split(car(car lista))".")))"." (cadr(car(rec-archivos path system))))
-                                                               (cons (cadr (car lista)) 
-                                                                     (cons (plus-one(caddr(car lista)))
-                                                                           (cons (cadddr(car lista))'())))))))
-                                                                                 
-              (encriptar2 (cdr lista) (append vacio (list (car lista))))))))
-    (encriptar2 (rec-archivos path system) '())))
-
-
-(define encriptar-t ;encripta el contenido de una carpeta
-  (lambda(system path)
-    (define encriptar3
-      (lambda(lista vacio)
-        (if(null? lista)
-           vacio
-           (if(equal? path  (car(car lista)))
-              (encriptar3 (cdr lista) (append vacio (list(cons (string-append(plus-one(car(string-split(car(car lista))".")))"." (cadr(car lista)))
-                                                               (cons (cadr (car lista)) 
-                                                                     (cons (plus-one(caddr(car lista)))
-                                                                           (cons (cadddr(car lista))'())))))))
-                                                                                 
-              (encriptar3 (cdr lista) (append vacio (list (car lista))))))))
-    (encriptar3 (rec-archivos (get-carpetas system) system) '())))
-
-
+                        
       
 #|TDA FUNCION 20 DECRYPT
 DOMINIO: system X  password (String) X folderName or Path (String)
@@ -693,54 +583,6 @@ DESCRIPCION: función para desencriptar un archivo o carpeta y todo su contenido
                       (get-system-drive-seleccionado system)
                       (get-system-ruta system))))))
 
-
-
-;(caddr (cdr(cdr(cadr(recuperar-listas S63)))))
-
-
-
-(define desencriptar-t ;desencripta el contenido de una carpeta
-  (lambda(system path)
-    (define encriptar4
-      (lambda(lista vacio)
-        (if(null? lista)
-           vacio
-           (if(equal? (string-append(plus-one(car(string-split path ".")))"."(car(cdr(string-split path "."))))  (car(car lista)))
-              (encriptar4 (cdr lista) (append vacio (list(cons (string-append(minus-one(car(string-split(car(car lista))".")))"." (cadr(car lista)))
-                                                               (cons (cadr (car lista)) 
-                                                                     (cons (minus-one(caddr(car lista)))
-                                                                           (cons (cadddr(car lista))'())))))))
-                                                                                 
-              (encriptar4 (cdr lista) (append vacio (list (car lista))))))))
-    (encriptar4 (rec-archivos (get-carpetas system) system) '())))              
-
-
-(define desencriptar ;encripta el contenido de una carpeta
-  (lambda(system path)
-    (define encriptar5
-      (lambda(lista vacio)
-        (if(null? lista)
-           vacio
-           (if(member (plus-one path) (map cadr (get-system-ruta system)))
-              (encriptar5 (cdr lista) (append vacio (list(cons (string-append(minus-one(plus-one(car(string-split(car(car lista))"."))))"." (cadr(car(rec-archivos path system))))
-                                                               (cons (cadr (car lista)) 
-                                                                     (cons (minus-one(plus-one(caddr(car lista))))
-                                                                           (cons (cadddr(car lista))'())))))))
-                                                                                 
-              (encriptar5 (cdr lista) (append vacio (list (car lista))))))))
-    (encriptar5 (rec-archivos path system) '())))
-
-
-
-    
-;desencriptando archivos y carpetas
-;(define S60 ((run S59 decrypt) "1234" "foo3.docx")) ;no logra desencriptar por clave incorrecta
-;(define S61 ((run S60 decrypt) "4321" "foo3.docx"))
-;(define S62 ((run S61 switch-drive) #\C))
-;(define S63 ((run S62 decrypt) "1234" "newFolder1"))
-
-
-
 #|TDA FUNCION 21 PLUS-ONE
 DOMINIO: String
 RECORRIDO: String
@@ -766,40 +608,6 @@ cada carácter un 1. Está función se puede usar en combinación con la funció
     (if (is-string string)
         (list->string(map integer->char(map (lambda (x) (- x 1)) (map char->integer (string->list string)))))
         #f)))
-
-
-
-
-
-
-
-
-;capa selectora, reune todos los elementos que tengan de raiz la letra c, de la cual quiero borrar el archivo
-(define (recuperar-listas system)
-  (if (null? (filter(lambda (x) (if(equal? (string-append(string(car(get-system-drive-seleccionado system)))":") (string-upcase(car(string-split (car x) "/"))))
-                                   #t
-                                   #f))
-                    (get-system-ruta system)))
-      null
-      (filter(lambda (x) (if(equal?(string-append(string(car(get-system-drive-seleccionado system)))":") (string-upcase(car(string-split (car x) "/"))))
-                                   #t
-                                   #f))
-                    (get-system-ruta system))))
-
-;capa selectora, me recupera los que tienen letra distinta a donde quiero borrar cierto archivo
-(define (no-recuperar-listas system)
-  (if (null? (filter(lambda (x) (if(not(equal? (string-append(string(car(get-system-drive-seleccionado system)))":") (string-upcase(car(string-split (car x) "/")))))
-                                   #t
-                                   #f))
-                    (get-system-ruta system)))
-      null
-      (filter(lambda (x) (if(not(equal?(string-append(string(car(get-system-drive-seleccionado system)))":") (string-upcase(car(string-split (car x) "/")))))
-                                   #t
-                                   #f))
-                    (get-system-ruta system))))
-
-
-
 
 
 
@@ -950,19 +758,5 @@ S60
 S61
 S62
 S63|#
-
-
-
-
-
-;(display ((run S16 dir) ""))
-;(newline)
-;(display ((run S55 dir)"/s"))
-
-
-
-;(make-carpeta (string-append (string(car(get-system-drive-seleccionado system)))":/") (append(crear-ruta path)(filter (lambda (x) (eq? (cadr x) path))(get-system-ruta system))) (get-system-usuario-conectado system))
-;                         (get-system-ruta system))) ;si está en el resto de lugares no se agrega
-                         ;(append(crear-ruta path)(filter (lambda (x) (eq? (cadr x) path))(get-system-ruta system)))))
 
 (provide (all-defined-out))
