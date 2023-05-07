@@ -13,21 +13,11 @@ RECURSION: NO
 ideas: se necesitan las funciones creadas en tda system(nombre temporal) para poder registrar un usuario en lista usuarios
 |#
 
-(define (make-user string);se supone que crea el usuario
-  (if(is-string string)
-     (list string)
-     (display "no se creará el usuario\n"))) ;revisa si es string
-
-
-
-;capa selectora
-(define get-usuarios car);obtener usuarios
-
 
 (define register
   (lambda(system)
     (lambda (string)
-      (if(member string (map get-usuarios(get-system-usuarios system))) ;buen
+      (if(member string (map car(get-system-usuarios system))) ;buen
          (make-system(get-system-name system)
                      (get-system-drive system)
                      (get-system-usuarios system)
@@ -42,25 +32,6 @@ ideas: se necesitan las funciones creadas en tda system(nombre temporal) para po
                      (get-system-drive-seleccionado system)
                      (get-system-ruta system)))))) ;no me guarda los otros usuarios
            
-;capa de pertenencia verifica si está el usuario en lista de usuarios
-(define (comprobar string system)
-  (member string (map get-usuarios(get-system-usuarios system))))
-     
-#|FUNCION PARA VERIFICAR SI ES USUARIO
-Pertenencia: verifica si el usuario ya existia o no
-DESCRIPCION DE LA FUNCION: funcion ligada a la no duplicidad de nombres de usuario
-dominio: lista
-recorrido: boolean
-recursion: no
-la verdad no me sirve mucho, pero la dejo por si acaso AHORA SI SIRVE SLDKSÑDFLK
-
-(define (is-user? user)
-  (if(list? user) ;pregunta si user es lista, en este caso s4 lo es
-     (if(string?(car(car(car(reverse user)))))
-        (cons #t (car(car(car(reverse user)))))  ;if
-        (cons #f (car(car(car(reverse user))))));else
-     (display "el usuario no existe o no se pudo crear\n"))) ;referente a que se copió el nombre de otro usuario
-|#
 
   
 #|FUNCION LOGIN
@@ -68,13 +39,6 @@ DOMINIO:system X userName (String)
 RECORRIDO: system
 RECURSION: 
 DESCRIPCION: Función que permite iniciar sesión con un usuario del sistema, solo si éste existe.|#
-
-
-;capa constructura
-(define (status-user string)
-  (if(is-string string)
-     (list string)
-     (list null)))
 
 (define login
   (lambda(system)
@@ -116,8 +80,14 @@ DESCRIPCION: Función que permite cerrar la sesión de un usuario en el sistema.
                   (get-system-usuarios system)
                   '();asigna lista vacia a los usuarios logeados
                   (get-system-drive-seleccionado system)
-                  (get-system-ruta system));asigna lista vacia a drive seleccionado
-      (display "no hay usuario conectado para deslogear\n")))
+                  (get-system-ruta system))
+      
+      (make-system(get-system-name system);falso
+                  (get-system-drive system)
+                  (get-system-usuarios system)
+                  (get-system-usuario-conectado system)
+                  (get-system-drive-seleccionado system)
+                  (get-system-ruta system))))
 
 ;añadiendo usuarios. Incluye caso S6 que intenta registrar usuario duplicado
 (define S4 ((run S3 register) "user1"))

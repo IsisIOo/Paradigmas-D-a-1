@@ -28,7 +28,13 @@ ideas: se necesitan las funciones creadas en tda system(nombre temporal) para po
   (lambda(system)
     (lambda (string)
       (if(member string (map get-usuarios(get-system-usuarios system))) ;buen
-         (display "ya existe el usuario \n") ;if
+         (make-system(get-system-name system)
+                     (get-system-drive system)
+                     (get-system-usuarios system)
+                     (get-system-usuario-conectado system)
+                     (get-system-drive-seleccionado system)
+                     (get-system-ruta system)) ;if
+         
          (make-system(get-system-name system);else
                      (get-system-drive system)
                      (cons(make-user string)(get-system-usuarios system))
@@ -81,8 +87,20 @@ DESCRIPCION: Función que permite iniciar sesión con un usuario del sistema, so
                           (cons(status-user string)(get-system-usuario-conectado system))
                           (get-system-drive-seleccionado system)
                           (get-system-ruta system))
-              (display "no se puede iniciar sesion, el usuario no existe\n")) ;falso
-          (display "ya hay un usuario conectado\n"))))) ;falso
+              
+              (make-system(get-system-name system);falso
+                          (get-system-drive system)
+                          (get-system-usuarios system)
+                          (get-system-usuario-conectado system)
+                          (get-system-drive-seleccionado system)
+                          (get-system-ruta system)))
+          
+          (make-system(get-system-name system);falso
+                      (get-system-drive system)
+                      (get-system-usuarios system)
+                      (get-system-usuario-conectado system)
+                      (get-system-drive-seleccionado system)
+                      (get-system-ruta system)))))) 
 
 #|FUNCION LOGOUT
 DOMINIO:system 
@@ -99,36 +117,45 @@ DESCRIPCION: Función que permite cerrar la sesión de un usuario en el sistema.
                   '();asigna lista vacia a los usuarios logeados
                   (get-system-drive-seleccionado system)
                   (get-system-ruta system));asigna lista vacia a drive seleccionado
-      (display "no hay usuario conectado para deslogear\n")))
+      (make-system(get-system-name system);falso
+                  (get-system-drive system)
+                  (get-system-usuarios system)
+                  (get-system-usuario-conectado system)
+                  (get-system-drive-seleccionado system)
+                  (get-system-ruta system))))
+
+;añadiendo usuarios. Incluye caso S6 que intenta registrar usuario duplicado
+(define S4 ((run S3 register) "user1"))
+(define S5 ((run S4 register) "user1"))
+(define S6 ((run S5 register) "user2"))
 
 
+;iniciando sesión con usuarios. Incluye caso S8 que intenta iniciar sesión con user2 sin antes haber salido con user1
+(define S7 ((run S6 login) "user1"))
+(define S8 ((run S7 login) "user2"))
 
-
-;SCRIPTS
-(define S4 ((run S2 register) "user1"))
-;(define S5 ((run S4 register) "user1"))
-(define S5 ((run S4 register) "user2"))
-S4
-S5
-;S6
-
-;(define S7 ((run S5 login) "user1"))
-(define S8 ((run S5 login) "user2"))
-;S7
-S8
+;cerrando sesión user1 e iniciando con user2
 (define S9 (run S8 logout))
 (define S10 ((run S9 login) "user2"))
+
+;cambios de unidad, incluyendo unidad inexistente K
+(define S11 ((run S10 switch-drive) #\K)) ;no existe este drive 
+(define S12 ((run S11 switch-drive) #\C))
+
+#|
+S4
+S5
+S6
+S7
+S8
 S9
 S10
-
+S11
+S12
+|#
 
 ;(map string? S4);para saber si hay un string en la lista
 ;(map string? (car(car(reverse S4)))); para saber si hay string en la lista usuarios
 ;(member "user1" (map car(car(reverse S4)))) ;verifica si en la lista está cierto usuario
-
-;iniciando sesión con usuarios. Incluye caso S8 que intenta iniciar sesión con user2 sin antes haber salido con user1
-;(define S7 ((run S6 login) "user1"))
-;(define S8 ((run S7 login) "user2"))
-;(define S8 ((run S7 login) "user1"))
 
 (provide (all-defined-out))

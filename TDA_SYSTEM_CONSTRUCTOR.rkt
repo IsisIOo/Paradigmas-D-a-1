@@ -61,7 +61,7 @@ modificación, además de verificar los permisos del recurso que será alterado|
 (define get-system-usuarios caddr)
 (define get-system-usuario-conectado cadddr)
 
-;modificadora
+
 (define(get-system-drive-seleccionado system)
   (caddr (reverse system))) ;se corre una posicion porque ahora el ultimo no es el tiempo
 

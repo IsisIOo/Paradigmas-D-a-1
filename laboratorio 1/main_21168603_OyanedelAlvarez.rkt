@@ -1,13 +1,193 @@
 #lang racket
-;TDA ARCHIVO/CARPETA
-(require "TDA_SYSTEM_CONSTRUCTOR.rkt")
-(require "tda_usuario.rkt")
-(require "funciones_archivos_carpetas.rkt")
+(require "tda_system_21168603_OyanedelAlvarez.rkt")
+(require "tda_user_21168603_OyanedelAlvarez.rkt")
+(require "tda_folder_21168603_OyanedelAlvarez.rkt")
+(require "tda_file_21168603_OyanedelAlvarez.rkt")
+(require "tda_drive_21168603_OyanedelAlvarez.rkt")
 
-#|FUNCION 9 md
+;este archivo será el main con todas las funciones obligatorias, despues procederé a
+;distribuir los tda a su tda correspondiente
+;Nombre:Isidora Oyanedel
+;Profesor:Gonzalo Martínez
+;Laboratorio n1 Paradigmas de programación
+
+(define(get-system-ruta system)
+  (cadr (reverse system)))
+
+#|Funcion 1 System - constructor
+DOMINIO: string
+RECORRIDO: system (conformado por nombre sistema, drive y usuario/s)
+DESCRIPCION: se ingresa un string en la funcion devolviendo un system
+             conformado por una lista de elementos que complementan el system
+RECURSION: no.
+|#
+
+(define (system string)
+  (if(is-string string)
+     (make-system string null null null null null) ;el primer elemento es el nombre, siguiente drive, sig usuario
+     #f))
+
+#|FUNCION 2 RUN
+DOMINIO: System X Command (funcion =command)
+RECORRIDO: system
+DESCRIPCION: Función que permite ejecutar un comando (función)
+sobre un sistema. Toda acción realizada con run relativa a creación de archivos,
+carpetas, renombrar, copiar, mover, eliminar, debe dejar un registro de la fecha de
+modificación, además de verificar los permisos del recurso que será alterado|#
+
+(define (run system command) ;se aplica una funcion en la lista system por ejemplo add-rive
+  (command system))
+
+
+#|FUNCION 3 ADD-DRIVE
+DOMINIO: system x/dominio del primer lambda
+         letter(char) x name(string) x capacity(int) /este se refiere a el dominio de la currificacion
+RECORRIDO: system
+DESCRIPCION: Función que permite añadir una unidad a unsistema. La letra de la unidad es única.
+RECURSION: no
+|#
+(define add-drive
+  (lambda(system)
+    (lambda (letter name capacity);info del drive
+      (if(and (member letter (map car(get-system-drive system)))(integer? capacity)(is-string name))
+         (make-system(get-system-name system) ;lo mantiene
+                     (get-system-drive system) 
+                     (get-system-usuarios system)
+                     (get-system-usuario-conectado system)
+                     (get-system-drive-seleccionado system)
+                     (get-system-ruta system))
+         
+         (make-system (get-system-name system)
+                      (cons(make-drive letter name capacity) ;;make-drive= lista que recibe 3 cosas, y le agrega algo adelante de 3 cosas
+                           (get-system-drive system)) ;cadr de la lista system, system =lista
+                      (get-system-usuarios system)
+                      (get-system-usuario-conectado system)
+                      (get-system-drive-seleccionado system)
+                      (get-system-ruta system))))))
+
+#|FUNCION 4  SWITCH DRIVE
+DOMINIO:system X letter (char)
+RECORRIDO: system
+DESCRIPCION: Permite fijar la unidad en la que el usuario
+realizará acciones. La función solo debe funcionar cuando hay un usuario con sesión
+iniciada en el sistema
+RECURSION: no|#
+
+(define switch-drive
+  (lambda(system)
+    (lambda(letter)
+      (if(and(is-char letter)(member letter (map car(get-system-drive system)))) ;no necesito que la letra sea un string
+         (make-system (get-system-name system)
+                      (get-system-drive system) ;cadr de la lista system, system =lista
+                      (get-system-usuarios system)
+                      (get-system-usuario-conectado system)
+                      (if (null?(get-system-drive-seleccionado system))
+                          (cons letter (get-system-drive-seleccionado system)) ;verdaderp
+                          (if(equal?  letter (car(get-system-drive-seleccionado system))) ;falso
+                             (get-system-drive-seleccionado system) ;v
+                             (cons letter null)))
+                      
+                      (cons(make-carpeta (string-downcase(string-append (string letter)":/"))
+                                         '()
+                                         (car(get-system-usuario-conectado system))
+                                         '()
+                                         '()) (get-system-ruta system)))
+         
+         (make-system(get-system-name system) ;en caso contrario solo lo mantiene
+                     (get-system-drive system) 
+                     (get-system-usuarios system)
+                     (get-system-usuario-conectado system)
+                     (get-system-drive-seleccionado system)
+                     (get-system-ruta system)))))) ;se supone que si no existe la letra en la lista no puede iniciar nada
+  ;pero creo que falta que agregar que debe haber tambien un usuario iniciado, componer esa funciones.
+
+
+
+
+#|FUNCION 5 REGISTER
+constructor:crea usuario
+DOMINIO: system x username (string)
+RECORRIDO: system
+RECURSION: NO
+DESCRIPCION: Función que permite registrar un nuevo usuario al
+sistema. El nombre de usuario es único y no puede ser duplicado.
+|#
+(define register
+  (lambda(system)
+    (lambda (string)
+      (if(member string (map car(get-system-usuarios system))) ;buen
+         (make-system(get-system-name system)
+                     (get-system-drive system)
+                     (get-system-usuarios system)
+                     (get-system-usuario-conectado system)
+                     (get-system-drive-seleccionado system)
+                     (get-system-ruta system)) ;if
+         
+         (make-system(get-system-name system);else
+                     (get-system-drive system)
+                     (cons(make-user string)(get-system-usuarios system))
+                     (get-system-usuario-conectado system)
+                     (get-system-drive-seleccionado system)
+                     (get-system-ruta system)))))) ;no me guarda los otros usuarios
+
+#|FUNCION 6 LOGIN
+DOMINIO:system X userName (String)
+RECORRIDO: system
+RECURSION: NO
+DESCRIPCION: Función que permite iniciar sesión con un usuario del sistema, solo si éste existe.|#
+
+(define login
+  (lambda(system)
+    (lambda (string)
+      (if (null? (get-system-usuario-conectado system))
+          (if (comprobar string system);verdadero
+              (make-system(get-system-name system);verdadero
+                          (get-system-drive system)
+                          (get-system-usuarios system)
+                          (cons(status-user string)(get-system-usuario-conectado system))
+                          (get-system-drive-seleccionado system)
+                          (get-system-ruta system))
+              
+              (make-system(get-system-name system);falso
+                          (get-system-drive system)
+                          (get-system-usuarios system)
+                          (get-system-usuario-conectado system)
+                          (get-system-drive-seleccionado system)
+                          (get-system-ruta system)))
+          
+          (make-system(get-system-name system);falso
+                      (get-system-drive system)
+                      (get-system-usuarios system)
+                      (get-system-usuario-conectado system)
+                      (get-system-drive-seleccionado system)
+                      (get-system-ruta system))))))
+
+#|FUNCION 7 LOGOUT
+DOMINIO:system 
+RECORRIDO: system
+RECURSION: no
+DESCRIPCION: Función que permite cerrar la sesión de un usuario en el sistema.
+|#        
+
+(define (logout system)
+  (if (not(null?(get-system-usuario-conectado system)))
+      (make-system(get-system-name system);verdadero
+                  (get-system-drive system)
+                  (get-system-usuarios system)
+                  '();asigna lista vacia a los usuarios logeados
+                  (get-system-drive-seleccionado system)
+                  (get-system-ruta system))
+      
+      (make-system(get-system-name system);falso
+                  (get-system-drive system)
+                  (get-system-usuarios system)
+                  (get-system-usuario-conectado system)
+                  (get-system-drive-seleccionado system)
+                  (get-system-ruta system))))
+#|FUNCION 8 md
 DOMINIO: system X name (String) 
 RECORRIDO: SYSTEM
-RECURSION: no sé
+RECURSION: no 
 DESCRIPCION:  función que permite crear directorio dentro de una unidad a partir del nombre especificado.
 Internamente la función añade datos relativos a usuario creador, fecha de creación, fecha de última
 modificación y atributos de seguridad como los señalados en el enunciado general|#
@@ -34,7 +214,8 @@ modificación y atributos de seguridad como los señalados en el enunciado gener
                      (get-system-drive-seleccionado system)
                      (get-system-ruta system))))));que devuelva lo mismo en caso de que no cumpla
 
-#|FUNCION 10 CD
+
+#|FUNCION 9 CD
 DOMINIO: system X path or folderName (String)
 RECORRIDO: system
 RECURSION: NO
@@ -114,10 +295,11 @@ la unidad respectivamente.|#
                       (get-system-drive-seleccionado system)
                       (get-system-ruta system))))))
 
-#|FUNCION 11  TDA system - add-file
+
+#|FUNCION 10  TDA system - add-file
 DOMINIO:system X file
 RECORRIDO: system
-RECURSION: NOC
+RECURSION: NO
 DESCRIPCION:función que permite añadir un archivo en la ruta actual.
 |#
 (define add-file
@@ -142,13 +324,11 @@ DESCRIPCION:función que permite añadir un archivo en la ruta actual.
                       (get-system-usuario-conectado system)
                       (get-system-drive-seleccionado system)
                       (get-system-ruta system))))))
-      
-      
-      
-#|TDA FUNCION 12 DEL
+
+#|TDA FUNCION 11 DEL
 DOMINIO:system X fileName or fileNamePattern (string)
 RECORRIDO: system
-RECURSION: NO C
+RECURSION: NO
 DESCRIPCION: función para eliminar un archivo o varios archivos en base a un patrón determinado.
 Esta versión también puede eliminar una carpeta completa con todos sus subdirectorios.
 El contenido eliminado se va a la papelera.
@@ -234,8 +414,7 @@ El contenido eliminado se va a la papelera.
                      (get-system-drive-seleccionado system)
                      (get-system-ruta system))))))
 
-
-#|FUNCION 13 rd
+#|FUNCION 12 rd
 DOMINIO:system X folderName or folderPath (string)
 RECORRIDO: system
 RECURSION: no obigatoria asi que no
@@ -268,7 +447,7 @@ Una carpeta se puede eliminar estando posicionado fuera de ésta.|#
                       (get-system-drive-seleccionado system)
                       (get-system-ruta system))))))
 
-#|FUNCION 14 copy
+#|FUNCION 13 copy
 DOMINIO: system X source (file or folder) (String) x target path (String)
 RECORRIDO: system
 RECURSION: NOC
@@ -318,9 +497,8 @@ DESCRIPCION:función para copiar un archivo o carpeta desde una ruta origen a un
                      (get-system-usuario-conectado system)
                      (get-system-drive-seleccionado system)
                      (get-system-ruta system))))))
-      
 
-#|FUNCION 15 MOVE
+#|FUNCION 14 MOVE
 DOMINIO:system X source (file or folder) (String) x target path (String)
 RECORRIDO: system
 RECURSION: NO
@@ -374,9 +552,9 @@ La operación de mover elimina el contenido desde la ruta origen.|#
                      (get-system-usuario-conectado system)
                      (get-system-drive-seleccionado system)
                      (get-system-ruta system))))))
-  
 
-#|FUNCION 16 REN (RENAME)
+
+#|FUNCION 15 REN (RENAME)
 DOMINIO:system XcurrentName (String) X newName (String)
 RECORRIDO:system
 RECURSION: no
@@ -435,15 +613,14 @@ siempre y cuando el nuevo nombre no viole la restricción de unicidad dentro del
                      (get-system-drive-seleccionado system)
                      (get-system-ruta system))))))
 
-
-#|FUNCION 17 DIR
+#|FUNCION 16 DIR
 DOMINIO: system X params (String list)
 RECORRIDO: string (formateado para poder visualizarlo con display)
-RECURSION: SI 
+RECURSION: SI, de cola en las funciones
 DESCRIPCION:función para listar el contenido de un directorio específico o de toda una ruta,
 lo que se determina mediante parámetros.
 |#
-;problema con entrada nula
+;problema con entrada nula 75%
 (define dir
   (lambda(system)
     (lambda (entry)
@@ -457,8 +634,7 @@ lo que se determina mediante parámetros.
                #f)))
       #f))))
 
-
-#|FUNCION 18 FORMAT
+#|FUNCION 17 FORMAT
 DOMINIO:system X letter (char) X name (String)
 RECORRIDO: system 
 RECURSION: NO
@@ -476,8 +652,7 @@ además de indicar nuevo nombre, pero conservando capacidad.
                      (get-system-usuario-conectado system)
                      (get-system-drive-seleccionado system)
                      (get-system-ruta system))))))
-
-#|TDA FUNCION 19 ENCRYPT
+#|TDA FUNCION 18 ENCRYPT
 DOMINIO:system X
         encryptFn (fn: String->String) X decryptFn (fn: String->String) password (String) X folderName or Path (String)
 RECORRIDO: system
@@ -513,7 +688,7 @@ en la metadata de la carpeta y su contenido, para una posterior desencriptación
                              (cons(make-carpeta (get-posicion system)
                                                 (car(reverse(string-split (car(recuperar-ruta system)) "/")))
                                                 (car(get-system-usuario-conectado system))
-                                                (encriptar-t system path)
+                                                (encriptar-t system path plus-one)
                                                 password)           
                                   (get-system-ruta system)))
                  
@@ -530,9 +705,8 @@ en la metadata de la carpeta y su contenido, para una posterior desencriptación
                       (get-system-usuario-conectado system)
                       (get-system-drive-seleccionado system)
                       (get-system-ruta system))))))
-                        
-      
-#|TDA FUNCION 20 DECRYPT
+
+#|TDA FUNCION 19 DECRYPT
 DOMINIO: system X  password (String) X folderName or Path (String)
 RECORRIDO: system
 RECURSION:
@@ -552,7 +726,7 @@ DESCRIPCION: función para desencriptar un archivo o carpeta y todo su contenido
                           (cons(make-carpeta (get-posicion system)
                                              (get-carpetas system) 
                                              (car(get-system-usuario-conectado system))
-                                             (desencriptar-t system path)
+                                             (desencriptar-t system path plus-one minus-one)
                                              '())           
                                (get-system-ruta system)))
               ;caso carpetas  
@@ -583,7 +757,7 @@ DESCRIPCION: función para desencriptar un archivo o carpeta y todo su contenido
                       (get-system-drive-seleccionado system)
                       (get-system-ruta system))))))
 
-#|TDA FUNCION 21 PLUS-ONE
+#|TDA FUNCION 20 PLUS-ONE
 DOMINIO: String
 RECORRIDO: String
 RECURSION: prob
@@ -597,7 +771,7 @@ de cada carácter un 1. Está función se puede usar en combinación con la func
        
 
 
-#|TDA FUNCION 22 MINUS-ONE
+#|TDA FUNCION 21 MINUS-ONE
 DOMINIO: String
 RECORRIDO: String
 RECURSION: prob
@@ -611,7 +785,31 @@ cada carácter un 1. Está función se puede usar en combinación con la funció
 
 
 
+;creando un sistema
+(define S0 (system "newSystem"))
 
+;añadiendo unidades. Incluye caso S2 que intenta añadir unidad con una letra que ya existe
+(define S1 ((run S0 add-drive) #\C "SO" 1000))
+(define S2 ((run S1 add-drive) #\C "SO1" 3000))
+(define S3 ((run S2 add-drive) #\D "Util" 2000))
+
+;añadiendo usuarios. Incluye caso S6 que intenta registrar usuario duplicado
+(define S4 ((run S3 register) "user1"))
+(define S5 ((run S4 register) "user1"))
+(define S6 ((run S5 register) "user2"))
+
+
+;iniciando sesión con usuarios. Incluye caso S8 que intenta iniciar sesión con user2 sin antes haber salido con user1
+(define S7 ((run S6 login) "user1"))
+(define S8 ((run S7 login) "user2"))
+
+;cerrando sesión user1 e iniciando con user2
+(define S9 (run S8 logout))
+(define S10 ((run S9 login) "user2"))
+
+;cambios de unidad, incluyendo unidad inexistente K
+(define S11 ((run S10 switch-drive) #\K)) ;no existe este drive 
+(define S12 ((run S11 switch-drive) #\C))
 
 ;añadiendo carpetas. Incluye casos de carpetas duplicadas.
 (define S13 ((run S12 md) "folder1"))
@@ -644,22 +842,6 @@ cada carácter un 1. Está función se puede usar en combinación con la funció
 (define S26 ((run S25 cd) "/")) ;funciona 16-04-23
 
 
-#|S13
-S14
-S15
-S16
-S17
-S18
-S19
-S20
-S21
-S22
-S23
-S24
-S25
-S26 ;todo bem|#
-
-    
 ;se cambia de unidad
 (define S27 ((run S26 switch-drive) #\D)) ;FUNCIONA
 
@@ -711,29 +893,6 @@ S26 ;todo bem|#
 (define S53 ((run S52 ren) "foo2.txt" "newFoo1.txt")) ;no debería efectuar cambios pues ya existe archivo con este nombre
 (define S54 ((run S53 cd) ".."))
 (define S55 ((run S54 ren) "folder1" "newFolder1"))
-      
-#|S27
-S28
-S29
-S30
-S31
-S32
-S33
-S34
-S35
-S36
-S37
-S38
-S39
-S40
-S41
-S42
-S43
-S44
-S45
-S46
-S47
-S48|#
 
 
 (define S56 ((run S55 encrypt) plus-one minus-one "1234" "newFolder1")) ;cambiar lo que hay dentro de la carpeta
@@ -748,15 +907,3 @@ S48|#
 (define S61 ((run S60 decrypt) "4321" "foo3.docx"))
 (define S62 ((run S61 switch-drive) #\C))
 (define S63 ((run S62 decrypt) "1234" "newFolder1"))
-
-#|
-S56
-S57
-S58
-S59
-S60
-S61
-S62
-S63|#
-
-(provide (all-defined-out))
