@@ -1,0 +1,10 @@
+#lang racket
+(require "tda_system_21168603_OyanedelAlvarez.rkt")
+(require "tda_user_21168603_OyanedelAlvarez.rkt")
+(require "tda_folder_21168603_OyanedelAlvarez.rkt")
+(require "tda_file_21168603_OyanedelAlvarez.rkt")
+(require "tda_drive_21168603_OyanedelAlvarez.rkt")
+(require "main_21168603_OyanedelAlvarez.rkt")
+
+;creando un sistema
+(define S0 (system "newSystem"))

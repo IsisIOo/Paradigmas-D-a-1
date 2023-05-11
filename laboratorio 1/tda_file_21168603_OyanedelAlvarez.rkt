@@ -1,8 +1,6 @@
 #lang racket
 (require "tda_system_21168603_OyanedelAlvarez.rkt")
 (require "tda_folder_21168603_OyanedelAlvarez.rkt")
- 
-;tda archivo
 
 ;CAPA CONSTRUCTORA
 
@@ -20,7 +18,7 @@ a los atributos que pueda tener el archivo (oculto, solo lectura)|#
 DOMINIO: file (lista de strings)
 RECORRIDO: make-file file
 RECURSION: no
-DESCRIPCION: crea una varianle con el mismo nombre file para que lo que la lista que se crea aqui sea recibido por la
+DESCRIPCION: crea una variante con el mismo nombre file para que lo que la lista que se crea aqui sea recibido por la
 funcion add-file y trabaje con ella|#
 (define file ;como makedrive
   (lambda (nombre ext cont . rest)
@@ -29,19 +27,20 @@ funcion add-file y trabaje con ella|#
 
 ;CAPA MODIFICADORA
 
-#|cambia-nombre-archivo
+#|set-cambia-nombre-archivo
 DOMINIO: system X nombre(string) X nuevo nombre (string)
 RECORRIDO: archivo llamado nombre renombrado como nuevo nombre
 RECURSION: no
 DESCRIPCION: remueve el nombre previo del archivo y luego de hacerlo le agrega nuevo nombre a la lista del archivo|#
-(define (cambia-nombre-archivo system name new-name) ;tda archivo
-  (append(remove-titulo2 name system) (list(cons new-name (remove name (car(no-remove-archivo2 name system)))))))
+(define (set-cambia-nombre-archivo system name new-name) ;tda archivo
+  (append(get-remove-titulo2 name system) (list(cons new-name (remove name (car(get-no-remove-archivo2 name system)))))))
 
-#|dominio: source x system
+#|set-eliminar_archivo
+dominio: source x system
 recorrido:system
 recursion: de cola
 descripcion: elimina el archivo original que ha sido movido a otro drive o carpeta|#
-(define eliminar_archivo
+(define set-eliminar_archivo
   (lambda(system source)
     (define DelFile
       (lambda(lista vacio) ;tdaarchivo
@@ -61,12 +60,12 @@ descripcion: elimina el archivo original que ha sido movido a otro drive o carpe
       (DelFile (get-system-ruta system) '())))
 
 
-#|encriptar-t
+#|set-encriptar-t
 DOMINIO: path (string) X system
 RECORRIDO: system archivos
 RECURSION: de cola
 DESCRIPCION:Funcion que encripta el archivo solicitado de una carpeta|#
-(define encriptar-t  ;tda archivo
+(define set-encriptar-t  ;tda archivo
   (lambda(system path fn1) ;fn1=plus one fn2=minus-one
     (define encriptar3
       (lambda(lista vacio)
@@ -79,15 +78,15 @@ DESCRIPCION:Funcion que encripta el archivo solicitado de una carpeta|#
                                                                            (cons (cadddr(car lista))'())))))))
                                                                                  
               (encriptar3 (cdr lista) (append vacio (list (car lista))))))))
-    (encriptar3 (rec-archivos (get-carpetas system) system) '())))
+    (encriptar3 (get-rec-archivos (get-carpetas system) system) '())))
 
 
-#|desencriptar-t
+#|set-desencriptar-t
 DOMINIO: path (string) X system
 RECORRIDO: system archivos
 RECURSION: de cola
 DESCRIPCION: Funcion que encuentra el archivo encriptado y lo desencripta|#
-(define desencriptar-t 
+(define set-desencriptar-t 
   (lambda(system path fn1 fn2) ;tda archivo ;fn1=plus one fn2=minus-one
     (define encriptar4
       (lambda(lista vacio)
@@ -100,7 +99,7 @@ DESCRIPCION: Funcion que encuentra el archivo encriptado y lo desencripta|#
                                                                            (cons (cadddr(car lista))'())))))))
                                                                                  
               (encriptar4 (cdr lista) (append vacio (list (car lista))))))))
-    (encriptar4 (rec-archivos (get-carpetas system) system) '())))
+    (encriptar4 (get-rec-archivos (get-carpetas system) system) '())))
 
 ;CAPA SELECTORA
 
@@ -111,19 +110,19 @@ RECURSION: no
 DESCRIPCION: obtiene los archivos mas actuales de acuerdo al sistema|#
 (define get-files (lambda (system) (car(cdr(cdr(car(get-system-ruta system))))))) ;tda archivo
 
-#|remove-titulo2 
+#|get-remove-titulo2 
 DOMINIO: nombre del archivo (string) X system
 RECORRIDO: system 
 RECURSION: no
 DESCRIPCION: obtiene la lista de archivos sin el elemento del cual se desea cambiar el nombre
 al combinarla con cambia-nombre-archivo logra insertar el archivo con nombre cambiado al sistema|#
-(define (remove-titulo2 filename system)  ;tda archivo
+(define (get-remove-titulo2 filename system)  ;tda archivo
       (filter (lambda(x) (if (not(equal? filename (car x)))
                             #t
                             #f))
-              (caddr(recuperar-ruta system))))
+              (caddr(get-recuperar-ruta system))))
 
-#|no-remove-archivo2
+#|get-no-remove-archivo2
 DOMINIO: nombre del archivo (string) X system
 RECORRIDO: system
 RECURSION: no
@@ -131,11 +130,11 @@ DESCRIPCION: obtiene la lista que contiene el nombre del archivo, al obtenerla s
 la diferencia con no-remove-archivo1 es que trabajan en distintas partes, este necesita recuperar la ultima actualizacion
 de la ruta de acuerdo al drive en que estamos.|#
 
-(define (no-remove-archivo2 file system) ;tdaarchivo
+(define (get-no-remove-archivo2 file system) ;tdaarchivo
       (filter (lambda(x)(if (equal? file (car x))
                             #t
                             #f))
-              (caddr(recuperar-ruta system))))
+              (caddr(get-recuperar-ruta system))))
 
 
 #|remove-extension 
@@ -145,13 +144,13 @@ RECURSION: no
 DESCRIPCION: obtiene y remueve los archivos que tengan la misma extension que la entrante
 se ejecuta en los archivos actuales|#
 
-(define (remove-extension filename system) ;tda archivo
+(define (get-remove-extension filename system) ;tda archivo
       (filter (lambda(x) (if (not(equal? filename (cadr x)))
                             #t
                             #f))
               (get-files system)))
 
-#|remove-titulo 
+#|get-remove-titulo 
 DOMINIO: filename (string) X system
 RECORRIDO: get-files
 RECURSION: no
@@ -164,27 +163,27 @@ se ejecuta en los archivos actuales|#
                             #f))
               (get-files system)))
 
-#|letter-titles
+#|get-letter-titles
 DOMINIO: filename (string) X system
 RECORRIDO: get-files
 RECURSION: no
 DESCRIPCION: remueve los elementos que tengan la misma letra inicial de nombre del archivo y
 tengan una extension de archivo igual a la entrante |#
 
-(define (letter-titles filename system)   ;tda archivo
+(define (get-letter-titles filename system)   ;tda archivo
    (filter (lambda(x) (if(not(and(equal? (car(string-split filename "*")) (string(car(string->list(car x)))))
                                  (equal? (car(string-split (cadr(string-split filename "*")) ".")) (car(cdr x)))))
                     #t
                    #f))
        (get-files system)))
 
-#|no-remove-archivo
+#|get-no-remove-archivo
 DOMINIO: file (string) X system
 RECORRIDO: get-files
 RECURSION: no
 DESCRIPCION: obtiene las propiedades del archivo file en su estado mas actual para asi poder moverlo a otra ubicacion
 Sirve para la funcion move y copy.|#
-(define (no-remove-archivo file system) ;tda archivo
+(define (get-no-remove-archivo file system) ;tda archivo
       (filter (lambda(x)(if (equal? file (car x))
                             #t
                             #f))

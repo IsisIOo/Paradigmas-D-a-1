@@ -41,11 +41,11 @@ DESCRIPCION: funcion que crea el drive con nombre cambiado y utilizando la funci
   (if (and(is-string nombre)(is-char letter))
       (if (member letter (map car(get-system-drive system)))
           (make-system(get-system-name system);verdadero
-                      (cons(make-drive letter nombre (car (cdr (cdr (car(no-remove letter system))))))(remove2 letter system))
+                      (cons(make-drive letter nombre (car (cdr (cdr (car(get-no-remove letter system))))))(get-remove2 letter system))
                       (get-system-usuarios system)
                       (get-system-usuario-conectado system)
                       (get-system-drive-seleccionado system)
-                      (remove1 letter system))
+                      (get-remove1 letter system))
           #f)
       #f))
 
@@ -69,39 +69,39 @@ RECURSION: no
 (define(get-system-drive-seleccionado system)
   (caddr (reverse system)))
 
-#|remove1 
+#|get-remove1 
 DOMINIO: letter (string) X system
 RECORRIDO: system
 RECURSION: no
 DESCRIPCION: obtiene y remueve elementos de la lista que tienen la primera letra igual a la primera letra de la ruta actual
 tipo entra c y la ruta es c/folder1/, cumple|#
 
-(define (remove1 letter system)
+(define (get-remove1 letter system)
       (filter (lambda(x)(if (not(equal?(string-append(string letter)":") (car(string-split (car x) "/"))))
                             #t
                             #f))
               (get-system-ruta system)))
 
-#|no-remove
+#|get-no-remove
 DOMINIO: filename (string) X system
 RECORRIDO: get-system-drive
 RECURSION: no
 DESCRIPCION: obtiene la lista de drive que tiene a letter (las propiedades del drive letter) para asi poder obtener
 su capacidad. Sirve para la funcion de renombrar drive|#
-(define (no-remove letter system) 
+(define (get-no-remove letter system) 
       (filter (lambda(x)(if (equal? letter (car x))
                             #t
                             #f))
               (get-system-drive system)))
 
-#|remove2 
+#|get-remove2 
 DOMINIO: letter (string) X system
 RECORRIDO: get-system-drive
 RECURSION: no
 DESCRIPCION: obtiene y remueve drives que tengan la misma letra que letter entrante
 lo ejecuta en un lugar distinto a remove1|#
 
-(define (remove2 letter system) 
+(define (get-remove2 letter system) 
       (filter (lambda(x)(if (not(equal? letter  (car x)))
                             #t
                             #f))

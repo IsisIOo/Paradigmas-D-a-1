@@ -16,28 +16,27 @@ RECURSION: no
 
 ;CAPA DE PERTENENCIA
 
-#|comprobar
+#|is-member
 DOMINIO: string (string) x system (system)
 RECORRIDO: bool
 DESCRIPCION: verifica si está el usuario en lista de usuarios
 RECURSION: no
 |#
-(define (comprobar string system)
+(define (is-member string system)
   (member string (map car(get-system-usuarios system))))
 
 
 
-#|status-user
+#|is-status-user
 DOMINIO: string (string)
 RECORRIDO: lista de un elemento
 DESCRIPCION: recrea un usuario pero en este caso, deja una lista vacia si no se cumple
 RECURSION: no
 |#
-;capa constructura
-(define (status-user string)
+(define (is-status-user string)
   (if(is-string string)
-     (list string)
-     (list null)))
+     string
+     null))
 
 
 ;CAPA SELECTORA

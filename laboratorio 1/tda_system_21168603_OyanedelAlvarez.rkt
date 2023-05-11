@@ -22,7 +22,7 @@ RECURSION: no
 
 (define (make-carpeta ruta string user file password) ;el primer elemento es la ruta con la letra, segundo elemento lo ultimo agregado, tercer user, 4to documento 5to, tipo de doc, usuario
   (list ruta string file user password (current-seconds))) ;este current seconds es la fecha de modificacion, aunque no se como mantenerlo fijo
-
+;LA PUSE AQUI PORQUE PROVOCABA DEPENDENCIA CIRCULAR
 
 
 ;CAPA PERTENECIA
@@ -55,7 +55,7 @@ RECORRIDO: ruta del sistema
 RECURSION: no
 DESCRIPCION: recupera todos los cambios en el stack |#
 
-(define(get-system-ruta system)
+(define(get-system-ruta system) ;aqui por dependencia circular
   (cadr (reverse system)))
 
 #|get-posicion

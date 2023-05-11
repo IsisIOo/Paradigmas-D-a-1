@@ -1,15 +1,10 @@
 #lang racket
+;script de pruebas
 (require "tda_system_21168603_OyanedelAlvarez.rkt")
 (require "tda_user_21168603_OyanedelAlvarez.rkt")
 (require "tda_folder_21168603_OyanedelAlvarez.rkt")
 (require "tda_file_21168603_OyanedelAlvarez.rkt")
 (require "tda_drive_21168603_OyanedelAlvarez.rkt")
-
-;este archivo será el main con todas las funciones obligatorias, despues procederé a
-;distribuir los tda a su tda correspondiente
-;Nombre:Isidora Oyanedel
-;Profesor:Gonzalo Martínez
-;Laboratorio n1 Paradigmas de programación
 
 #|Funcion 1 System - constructor
 DOMINIO: string
@@ -146,11 +141,11 @@ DESCRIPCION: Función que permite iniciar sesión con un usuario del sistema, so
   (lambda(system)
     (lambda (string)
       (if (and (null? (get-system-usuario-conectado system))(is-string string))
-          (if (is-member string system);verdadero
+          (if (comprobar string system);verdadero
               (make-system(get-system-name system);verdadero
                           (get-system-drive system)
                           (get-system-usuarios system)
-                          (cons(is-status-user string)(get-system-usuario-conectado system))
+                          (cons(status-user string)(get-system-usuario-conectado system))
                           (get-system-drive-seleccionado system)
                           (get-system-ruta system))
               
@@ -241,10 +236,10 @@ la unidad respectivamente.|#
                          (get-system-usuarios system)
                          (get-system-usuario-conectado system)
                          (get-system-drive-seleccionado system)
-                         (cons(make-carpeta (string-downcase(string-append (car(get-recuperar-ruta system)) path "/"))
+                         (cons(make-carpeta (string-downcase(string-append (car(recuperar-ruta system)) path "/"))
                                             null
                                             (get-system-usuario-conectado system)
-                                            (get-rec-archivos path system)
+                                            (rec-archivos path system)
                                             '())
                               (get-system-ruta system)))
              
@@ -257,7 +252,7 @@ la unidad respectivamente.|#
                              (cons(make-carpeta (string-downcase(string-append(string-join(reverse(cdr(reverse(string-split (get-posicion system) "/"))))"/")"/"))
                                                 null
                                                 (get-system-usuario-conectado system)
-                                                (get-rec-archivos path system)
+                                                (rec-archivos path system)
                                                 '())
                                   (get-system-ruta system)))
                     
@@ -270,7 +265,7 @@ la unidad respectivamente.|#
                                 (cons(make-carpeta (substring (car(car(get-system-ruta system))) 0 3)
                                                    null
                                                    (get-system-usuario-conectado system)
-                                                   (get-rec-archivos path system)
+                                                   (rec-archivos path system)
                                                    '())
                                      (get-system-ruta system)))
 
@@ -283,7 +278,7 @@ la unidad respectivamente.|#
                                    (cons(make-carpeta (string-downcase path)
                                                       null
                                                       (get-system-usuario-conectado system)
-                                                      (get-rec-archivos path system)
+                                                      (rec-archivos path system)
                                                       '()) ;AQUI ARCHIVOS
                               (get-system-ruta system)))
 
@@ -354,7 +349,7 @@ El contenido eliminado se va a la papelera.
                          (cons(make-carpeta (string-downcase(get-posicion system))
                                             (string-downcase(car(reverse(string-split(get-posicion system)"/"))))
                                             (get-system-usuario-conectado system)
-                                            (get-remove-extension (car (string-split (car(string-split filename "*")) ".")) system)
+                                            (remove-extension (car (string-split (car(string-split filename "*")) ".")) system)
                                             '())           
                               (get-system-ruta system)))
              
@@ -368,7 +363,7 @@ El contenido eliminado se va a la papelera.
                              (cons(make-carpeta (string-downcase(get-posicion system))
                                                 (string-downcase(car(reverse(string-split(get-posicion system)"/"))))
                                                 (get-system-usuario-conectado system)
-                                                (get-letter-titles filename system)
+                                                (letter-titles filename system)
                                                 '())           
                                   (get-system-ruta system)))
                  
@@ -391,7 +386,7 @@ El contenido eliminado se va a la papelera.
                                      (get-system-usuarios system)
                                      (get-system-usuario-conectado system)
                                      (get-system-drive-seleccionado system)
-                                     (get-remove-posicion filename system))
+                                     (remove-posicion filename system))
                          
                          (if(equal? "*.*" filename) ;borra todos los archivos DOC TXT
                             (make-system(get-system-name system)
@@ -431,7 +426,7 @@ Una carpeta se puede eliminar estando posicionado fuera de ésta.|#
   (lambda (system)
     (lambda(foldername)
       (if (and(is-string foldername)(member foldername (map cadr (get-system-ruta system))) (not(null? (get-system-usuario-conectado system))))
-          (if(not(null? (get-rec-archivos foldername system))) ;si es vacia la union del dueño y los archivos no se hace nada
+          (if(not(null? (rec-archivos foldername system))) ;si es vacia la union del dueño y los archivos no se hace nada
              (make-system(get-system-name system)
                          (get-system-drive system) ;si no es vacia la ultima version, lo mantiene
                          (get-system-usuarios system)
@@ -444,7 +439,7 @@ Una carpeta se puede eliminar estando posicionado fuera de ésta.|#
                              (get-system-usuarios system)
                              (get-system-usuario-conectado system)
                              (get-system-drive-seleccionado system)
-                             (get-remove-posicion foldername system)))
+                             (remove-posicion foldername system)))
           
           (make-system(get-system-name system) ;en caso contrario solo lo mantiene
                       (get-system-drive system) 
@@ -464,7 +459,7 @@ DESCRIPCION:función para copiar un archivo o carpeta desde una ruta origen a un
     (lambda(source target)
       ;AGREGAR QUE SE PUEDE HACER SOLO SI LA ULTIMA POSICION DE LOS ARCHIVOS NO SEA VACIA ;problema con get-files
       (if(and(is-string source)(is-string target)(not(null? (get-system-usuario-conectado system))))    ;si es miembro el ultimo elemento del path en las carpetas creadas y existe el archivo en los archivos
-         (if (and(member(car(reverse(string-split target "/"))) (map cadr (get-system-ruta system))) (member source (map car(map car (get-remove-nulos-archivos system)))))
+         (if (and(member(car(reverse(string-split target "/"))) (map cadr (get-system-ruta system))) (member source (map car(map car (remove-nulos-archivos system)))))
              (make-system(get-system-name system)
                          (get-system-drive system)
                          (get-system-usuarios system)
@@ -473,7 +468,7 @@ DESCRIPCION:función para copiar un archivo o carpeta desde una ruta origen a un
                          (cons(make-carpeta (string-downcase target) 
                                             (car(reverse(string-split target "/")))
                                             (get-system-usuario-conectado system)
-                                            (get-no-remove-archivo source system)
+                                            (no-remove-archivo source system)
                                             '())     ;EL ARCHIVO DEBE IR CON TODAS SUS PROPIEDADES       
                               (get-system-ruta system)))
              
@@ -486,7 +481,7 @@ DESCRIPCION:función para copiar un archivo o carpeta desde una ruta origen a un
                              (cons(make-carpeta (string-downcase(string-append target source "/")) 
                                                 source ;DUEÑO DE FOLDER1, O LO QUE ENTRE
                                                 (get-system-usuario-conectado system)
-                                                (get-rec-archivos source system)
+                                                (rec-archivos source system)
                                                 '())      ;EL ARCHIVO DEBE IR CON TODAS SUS PROPIEDADES       
                                                 (get-system-ruta system)))
                  
@@ -526,9 +521,9 @@ La operación de mover elimina el contenido desde la ruta origen.|#
                         (cons(make-carpeta (string-downcase(string-append target source "/"))
                                            source ;DUEÑO DE FOLDER1, O LO QUE ENTRE
                                            (get-system-usuario-conectado system)
-                                           (get-rec-archivos source system)
+                                           (rec-archivos source system)
                                            '())      ;EL ARCHIVO DEBE IR CON TODAS SUS PROPIEDADES       
-                             (get-remove-carpeta-drive source target system)))
+                             (remove-carpeta-drive source target system)))
             ;caso de archivo
          (if(and(member (car(reverse(string-split (string-downcase target) "/"))) (map cadr (get-system-ruta system))) (member (string-downcase target) (map car (get-system-ruta system))))
 
@@ -540,9 +535,9 @@ La operación de mover elimina el contenido desde la ruta origen.|#
                         (cons(make-carpeta (string-downcase target)
                                            (car(reverse(string-split target "/"))) ;DUEÑO DE FOLDER1, O LO QUE ENTRE
                                            (get-system-usuario-conectado system)
-                                           (append(get-rec-archivos (car(reverse(string-split target "/"))) system) (get-no-remove-archivo source system))
+                                           (append(rec-archivos (car(reverse(string-split target "/"))) system) (no-remove-archivo source system))
                                            '()) ;EL ARCHIVO DEBE IR CON TODAS SUS PROPIEDADES       
-                             (set-eliminar_archivo system source)))
+                             (eliminar_archivo system source)))
              
              (make-system(get-system-name system) ;en caso contrario solo lo mantiene
                          (get-system-drive system) 
@@ -574,17 +569,17 @@ siempre y cuando el nuevo nombre no viole la restricción de unicidad dentro del
          ;solo tomare en cuenta si existe en la ultima actualizacion de archivos
          ;si existe el nombre en los archivos y si no existe el nuevo nombre en los archivos(tratando de evitar las duplicas)
 ;Caso nombre archivos
-         (if (and (member name (map car(caddr(get-recuperar-ruta system))))
-                  (not(member new-name (map car(caddr(get-recuperar-ruta system))))))
+         (if (and (member name (map car(caddr(recuperar-ruta system))))
+                  (not(member new-name (map car(caddr(recuperar-ruta system))))))
              (make-system(get-system-name system)
                          (get-system-drive system)
                          (get-system-usuarios system)
                          (get-system-usuario-conectado system)
                          (get-system-drive-seleccionado system)
-                         (cons(make-carpeta (string-downcase(car(get-recuperar-ruta system)))
-                                                    (car(reverse(string-split (car(get-recuperar-ruta system)) "/")))
+                         (cons(make-carpeta (string-downcase(car(recuperar-ruta system)))
+                                                    (car(reverse(string-split (car(recuperar-ruta system)) "/")))
                                                     (get-system-usuario-conectado system)
-                                                    (set-cambia-nombre-archivo system name new-name)
+                                                    (cambia-nombre-archivo system name new-name)
                                                     '())           
                                             (get-system-ruta system)))
              
@@ -601,7 +596,7 @@ siempre y cuando el nuevo nombre no viole la restricción de unicidad dentro del
                          (cons(make-carpeta (string-downcase(string-append(string-append (get-posicion system) new-name)"/")) 
                                             new-name
                                             (get-system-usuario-conectado system)
-                                            (get-rec-archivos name system)
+                                            (rec-archivos name system)
                                             '())           
                               (get-system-ruta system)))
              
@@ -693,9 +688,9 @@ en la metadata de la carpeta y su contenido, para una posterior desencriptación
                              (get-system-usuario-conectado system)
                              (get-system-drive-seleccionado system)
                              (cons(make-carpeta (get-posicion system)
-                                                (car(reverse(string-split (car(get-recuperar-ruta system)) "/")))
+                                                (car(reverse(string-split (car(recuperar-ruta system)) "/")))
                                                 (get-system-usuario-conectado system)
-                                                (set-encriptar-t system path plus-one)
+                                                (encriptar-t system path plus-one)
                                                 password)           
                                   (get-system-ruta system)))
                  
@@ -733,11 +728,11 @@ DESCRIPCION: función para desencriptar un archivo o carpeta y todo su contenido
                           (cons(make-carpeta (get-posicion system)
                                              (get-carpetas system) 
                                              (get-system-usuario-conectado system)
-                                             (set-desencriptar-t system path plus-one minus-one)
+                                             (desencriptar-t system path plus-one minus-one)
                                              '())           
                                (get-system-ruta system)))
               ;caso carpetas  
-              (if (and(equal? password (caddr (cdr(cdr(cadr(get-recuperar-listas system))))))  (member(plus-one path) (map cadr (get-system-ruta system))))
+              (if (and(equal? password (caddr (cdr(cdr(cadr(recuperar-listas system))))))  (member(plus-one path) (map cadr (get-system-ruta system))))
                   (make-system(get-system-name system)
                               (get-system-drive system)
                               (get-system-usuarios system)
@@ -791,139 +786,193 @@ cada carácter un 1. Está función se puede usar en combinación con la funció
         #f)))
 
 
-
+;SCRIPTS DE PRUEBA
 ;creando un sistema
-(define S0 (system "newSystem"))
+(define S0A (system 123)) ;Deberia fallar porque no funciona con int
+(define S0B (system #\D)) ;Deberia fallar porque no funciona con char
+(define S0C (system "System"));SEGUIR CON ESTE
+;S0A
+;S0B
+;S0C
+(define S1A ((run S0C add-drive) "hola!" "SO" 1000)) ;No deberia funcionar porque el primer elemento debe ser char
+(define S1B ((run S0C add-drive) #\C 123 1000)) ;No deberia funcionar porque el segundo elemento es un int
+(define S1C ((run S0C add-drive) #\C "SO" "hola")) ;No deberia funcionar porque el tercer elemento es un string
+(define S1D ((run S0C add-drive) #\C "SO" 1000)) ;FUNCIONA PORQUE CUMPLE LAS CONDICIONES
+(define S1E ((run S1D add-drive) #\G "S1" 4000))
+(define S1F ((run S1E add-drive) #\D "S34" 2000))
+(define S1G ((run S1F add-drive) #\E "S12" 12000))
+;S1A
+;S1B
+;S1C
+;S1D ;SEGUIR ESTE PORQUE ES EL QUE FUNCIONA CON TODO
+;S1E
+;S1F
+;S1G
 
-;añadiendo unidades. Incluye caso S2 que intenta añadir unidad con una letra que ya existe
-(define S1 ((run S0 add-drive) #\C "SO" 1000))
-(define S2 ((run S1 add-drive) #\C "SO1" 3000))
-(define S3 ((run S2 add-drive) #\D "Util" 2000))
+(define S2A ((run S1G register) 123)) ;Arroja falso porque es un int LANZA #F
+(define S2B ((run S1G register) #\C)) ;No deberia funcionar porque es un char LANZA #F NO SE PUEDE SEGUIR CON EL 
+(define S2C ((run S1G register) "Isidora")) 
+(define S2D ((run S2C register) "Lola"))
+(define S2E ((run S2D register) "Karla"));SEGUIR CON ESTE
+;S2A
+;S2B
+;S2C
+;S2D
+;S2E
 
-;añadiendo usuarios. Incluye caso S6 que intenta registrar usuario duplicado
-(define S4 ((run S3 register) "user1"))
-(define S5 ((run S4 register) "user1"))
-(define S6 ((run S5 register) "user2"))
-
-
-;iniciando sesión con usuarios. Incluye caso S8 que intenta iniciar sesión con user2 sin antes haber salido con user1
-(define S7 ((run S6 login) "user1"))
-(define S8 ((run S7 login) "user2"))
+(define S3A ((run S2E login) 123)) ;No inicia sesion porque 1. es un INT y no funciona con él 2. este usuario no existe
+(define S3B ((run S3A login) #\C)) ;No inicia sesion porque 1. es un CHAR y no funciona con él 2. este usuario no existe
+(define S3C ((run S3B login) "Sandra")) ;No inicia sesion porque este usuario no existe
+(define S3D ((run S3C login) "Isidora")) ;Inicia sesion
+;S3A
+;S3B
+;S3C
+;S3D
 
 ;cerrando sesión user1 e iniciando con user2
-(define S9 (run S8 logout))
-(define S10 ((run S9 login) "user2"))
+(define S4A (run S3D logout)) ;CIERRA LA SESION
+(define S4B ((run S4A login) "Isidora")) ;VUELVE A INICIAR SESION
+(define S4C (run S4B logout))
+(define S4D ((run S4C login) "Thomas")) ;No inicia porque no existe este usuario
+(define S4E ((run S4D login) "Lola"))
+(define S4F (run S4E logout))
+(define S4G ((run S4F login) "Isidora")) ;AQUI
+
+;S4A
+;S4B
+;S4C
+;S4D
+;S4E
+;S4F
+;S4G
 
 ;cambios de unidad, incluyendo unidad inexistente K
-(define S11 ((run S10 switch-drive) #\K)) ;no existe este drive 
-(define S12 ((run S11 switch-drive) #\C))
+(define S5A ((run S4G switch-drive) #\K)) ;no existe este drive asi que no hace nada, tampoco funciona si no tengo usuario conectado
+(define S5B ((run S5A switch-drive) #\G)) ;funciona porque existe el drive
+(define S5C ((run S5B switch-drive) #\C)) ;funciona
+
+;S5A
+;S5B
+;S5C
 
 ;añadiendo carpetas. Incluye casos de carpetas duplicadas.
-(define S13 ((run S12 md) "folder1"))
-(define S14 ((run S13 md) "folder2"))
-(define S15 ((run S14 md) "folder2")) ;funciona
-(define S16 ((run S15 md) "folder3"))
+(define S6A ((run S5C md) "carpeta1"))
+(define S6B ((run S6A md) "carpeta2"))
+(define S6C ((run S6B md) "carpeta1")) ;funciona
+(define S6D ((run S6C md) "carpeta2"))
+
+;S6A
+;S6B
+;S6C
+;S6D
 
 ;ingresa a carpeta folder2
-(define S17 ((run S16 cd) "folder2")) ;funciona
-
-;crea subcarpeta folder21 dentro de folder2 (incluye caso S19 de carpeta con nombre duplicado)
-(define S18 ((run S17 md) "folder21")) ;funciona
-(define S19 ((run S18 md) "folder21")) ;cumple
-
-;;ingresa a subcarpeta e intenta ingresar a subcarpeta inexistente S21
-(define S20 ((run S19 cd) "folder21")) ;funciona
-(define S21 ((run S20 cd) "folder22")) ;funciona 16-04-23
-
+(define S7A ((run S6D cd) "carpeta2"))
 ;;vuelve a carpeta anterior
-(define S22 ((run S21 cd) ".."))  ;funciona 16-04-23
-
-;;vuelve a ingresar folder21
-(define S23 ((run S22 cd) "folder21")) ;segun yo si deberia poder a entrar, pues la carpeta no se ha eliminado. Agregar "/"
-
-;crea subcarpeta folder211 e ingresa
-(define S24 ((run S23 md) "folder211")) ;funciona 16-04-23
-(define S25 ((run S24 cd) "folder211")) ;funciona 16-04-23
-
-;vuelve a la raíz de la unidad c:/
-(define S26 ((run S25 cd) "/")) ;funciona 16-04-23
-
-
-;se cambia de unidad
-(define S27 ((run S26 switch-drive) #\D)) ;FUNCIONA
-
-;crea carpeta e ingresa a carpeta
-(define S28 ((run S27 md) "folder5")) ;FUNCIONA
-(define S29 ((run S28 cd) "folder5")) ;FUNCIONA
-
-;se cambia de carpeta en base a la ruta especificada
-(define S30 ((run S29 cd) "C:/folder1/")) 
+(define S7B ((run S7A cd) ".."));funciona
+(define S7C ((run S7B cd) "carpeta1"))
+;(define S7D ((run S7C md) "carpeta4")) ;cumple la creacion de subcarpetas
+;(define S7E ((run S7D cd) "carpeta4"))
+;S7A
+;S7B
+;S7C
+;S7D
+;S7E
 
 ;formateando drive D:
-(define S31 ((run S30 format) #\D "newD")) ;FUNCIONAAAA 17-04-2023
-      
-;añadiendo archivos
-(define S32 ((run S31 add-file) (file "foo1.txt" "txt" "hello world 1"))) ;funciona 17-04 
-(define S33 ((run S32 add-file) (file "foo2.txt" "txt" "hello world 2"))) ;funciona 17-04 
-(define S34 ((run S33 add-file) (file "foo3.docx" "docx" "hello world 3"))) ;funciona 17-04 
-(define S35 ((run S34 add-file) (file "goo4.docx" "docx" "hello world 4" #\h #\r))) ;funciona 17-04 , no me agrada la lista
-;con atributos de seguridad oculto (h) y de solo lectura (r)
+(define S8A ((run S7C format) #\G "GAGA")) ;FUNCIONAAAA 17-04-2023
+(define S8B ((run S8A format) #\E "ELMO"))
+(define S8C ((run S8B format) #\D "DEDENEE"))
+;S8A
+;S8B
+;S8C
 
-;eliminando archivos
-(define S36 ((run S35 del) "*.txt")) ;borra todos los txt ;FUNCIONA 19-04
-(define S37 ((run S35 del) "f*.docx")) ;borra los que comienzan con f y tengan extension .doc BORRA 1 ;FUNCIONA 19-04
-(define S38 ((run S35 del) "goo4.docx")) ;borra el que tiene ese titulo ;FUNCIONA 19-04
-(define S39 ((run S35 cd) ".."))
-;(define S39a ((run S39 cd) "folder1"));FUNCIONA 19-04
-(define S40 ((run S35 del) "folder1")) ;borra la carpeta con todo FUNCIONA 19-04 -20
+(define S9A ((run S8C add-file) (file "bruno.txt" "txt" "Te extraño dog")))
+(define S9B ((run S9A add-file) (file "cool.txt" "txt" "Hola don cool")))
+(define S9C ((run S9B add-file) (file "luna.docx" "docx" "Llorona")))
+;S9A
+;S9B
+;S9C
 
-;borrando una carpeta
-(define S41 ((run S39 rd) "folder1"))  ;no debería borrarla, pues tiene archivos, funciona 20-04, devuelve c pq en s39 me sali de folder1
-(define S42 ((run S41 cd) "folder1")) ;VUELVO A ENTRAR EN LA CARPETA Y RECUPERO LOS ARCHIVOS
-(define S43 ((run S42 del) "*.*"));borra todos los archivos FUNCIONA LO DEJA PELADO LA PARTE DE LOS ARCHIVOS
-(define S44 ((run S43 cd) ".."))
-(define S45 ((run S44 rd) "folder1")) ;FUNCIONA 20-04
+(define S10A ((run S9C del) "*.txt")) ;borra todos los txt ;FUNCIONA 19-04
+(define S10B ((run S9C del) "l*.docx")) ;borra los que comienzan con f y tengan extension .doc BORRA 1 ;FUNCIONA 19-04
+(define S10C ((run S9C del) "bruno.txt")) ;borra el que tiene ese titulo ;FUNCIONA 19-04
+(define S10D ((run S9C cd) ".."))
+;S10A
+;S10B
+;S10C
+;S10D
 
+(define S11A ((run S10D rd) "carpeta1"))
+(define S11A2 ((run S11A cd) "carpeta1")) 
+(define S11B ((run S11A2 rd) "folder1")) ;no deberia hacer nada porque esta carpeta no existe
+(define S11C ((run S11B del) "*.*")) ;borra los archivos de carpeta1
+(define S11D ((run S11C rd) "carpeta1")) ;borra carpeta1 del sistema
+(define S11E ((run S11D cd) "carpeta1")) ;ya no puede entrar porque no existe
+;S11A
+;S11A2
+;S11B
+;S11C
+;S11D
+;S11E
 
-;copiando carpetas y archivos
-(define S46 ((run S35 copy) "foo1.txt" "C:/folder3/")) ;funciona por coincidencia
-(define S47 ((run S46 cd) ".."))
-(define S48 ((run S47 copy) "folder1" "D:/"))
+(define S12A ((run S9C copy) "bruno.txt" "C:/carpeta2/")) ;REAPARECE CARPETA1 PORQUE USA UNAA VERSION ANTIGUA
+(define S12B ((run S12A copy) "luna.txt" "C:/carpeta2/")) ;no copia porque no existe archivo luna.txt
+(define S12C ((run S12B copy) "carpeta1" "G:/"))
+;S12A
+;S12B
+;S12C
 
+(define S13A ((run S12C move) "folder3" "D:/"));NO DEBERIA HACER NADA
+(define S13B ((run S13A move) "folder3" #\D)) ;NO DEBERIA HACER NADA
+;(define S13C ((run S13B move)  "luna.docx" "F:/carpeta2/")) ;funciona bien pero al reves, como lo muevo al del drive, se borra del drive que no es el actual cuando debio moverse en el drive actual, pero el move solo funciona entre distintos drives?
+(define S13C ((run S13B move) 123 "C:/carpeta2/")) ;no deberia hacer nada
+;S13A
+;S13B
+;S13C
 
-;moviendo carpetas y archivos
-(define S49 ((run S48 move) "folder3" "D:/")) ;SE BORRA FOLDER3 DE C Y EL REGISTRO
-(define S50 ((run S49 cd) "folder1")) ;DEBERIA MOVERSE EN C
-(define S51 ((run S50 move) "foo3.docx" "D:/folder3/")) ;75% NO PUEDO RECUPERAR QUE ESTÉN PUESTOS DESPUES DEL QUE DEBO ELIMINAR
+(define S14A ((run S13C ren) "bruno.txt" "newBruno.txt")) ;solo ejecuta este cambio porque en la ruta actual de c la ultima carpeta abierta solo tiene el archivo bruno
+(define S14B ((run S14A ren) "luna.docx" "newLuna.docx")) ;no hace nada porque en la ruta actual este archivo no se encuentra
+(define S14C ((run S14B ren) "newBruno.txt" "newLuna.docx"))
 
-(define S52 ((run S51 ren) "foo1.txt" "newFoo1.txt"))
-(define S53 ((run S52 ren) "foo2.txt" "newFoo1.txt")) ;no debería efectuar cambios pues ya existe archivo con este nombre
-(define S54 ((run S53 cd) ".."))
-(define S55 ((run S54 ren) "folder1" "newFolder1"))
+;S14A
+;S14B
+;S14C
 
+(define S14D ((run S14C cd) ".."))
+(define S14E ((run S14D ren) "carpeta2" "NuevitaCarpeta2")) 
+;S14D
+;S14E
 
-(define S56 ((run S55 encrypt) plus-one minus-one "1234" "newFolder1")) ;cambiar lo que hay dentro de la carpeta
+(define S14F ((run S14E cd) "NuevitaCarpeta2"))
+;S14F
 
-;listando la información
-(display ((run S16 dir)"")) ;aqui le coloque comillas para que corra
-(newline)
-(display ((run S55 dir)"")) ;aqui le coloque comillas para que corra
-(newline)
-(display ((run S55 dir) "/s")) ;muestra carpetas y subcarpetas de la unidad C
-(newline)
-(display ((run S55 dir) "/s /a")) ;muestra todo el contenido de carpetas y subcarpetas de la unidad C incluyendo archivo oculto goo4.docx
+;(display ((run S14D dir) "/s")) ;muestra carpetas y subcarpetas de la unidad C FUNCIONA
+;(display ((run S14D dir) "/s /a"))
+;(display ((run S14D dir) "/d")) ;NO EXISTE ESTA OPCION
 
-;(display ((run S16 dir) ""))
-;(newline)
-;(display ((run S55 dir)"/s"))
-
-(define S57 ((run S56 switch-drive) #\D))
-(define S58 ((run S57 cd) "folder3"))
-(define S59 ((run S58 encrypt) plus-one minus-one "4321" "foo3.docx"))
-
+(define S15A ((run S14F encrypt) plus-one minus-one "1234" "NuevitaCarpeta2"))
+(define S15B ((run S15A switch-drive) #\G))
+(define S15C ((run S15B cd) "carpeta1"))
+(define S15D ((run S15C encrypt) plus-one minus-one "4321" "luna.docx"))
+(define S15E ((run S15D encrypt) plus-one minus-one "9002" "carpeta3")) ;no deberia hacer nada porque la carpeta no existe 
+;S15A
+;S15B
+;S15C
+;S15D
+;S15E
+;no puede encriptar dos veces, se encripta el titulo pero no el contenido
 
 ;desencriptando archivos y carpetas
-(define S60 ((run S59 decrypt) "1234" "foo3.docx")) ;no logra desencriptar por clave incorrecta
-(define S61 ((run S60 decrypt) "4321" "foo3.docx"))
-(define S62 ((run S61 switch-drive) #\C))
-(define S63 ((run S62 decrypt) "1234" "newFolder1"))
+(define S16A ((run S15E decrypt) "5118" "luna.docx")) ;no logra desencriptar por clave incorrecta
+(define S16B ((run S16A decrypt) "4321" "luna.docx"))
+
+(define S16C ((run S16B switch-drive) #\C))
+(define S16D ((run S16C decrypt) "1234" "NuevitaCarpeta2"))
+
+;S16A
+;S16B
+;S16C
+;S16D
+
+;75% MOVE ARCHIVO A OTRO CARPETA O DRIVE Y 75% DIR Y 75% ENCRIPTAR PORQUE SOLO LO PUEDE HACER UNA VEZ Y DESENCRIPTAR
