@@ -1,9 +1,9 @@
 #lang racket
-;(require "tda_system.rkt")
-;(require "tda_user.rkt")
-;(require "tda_carpeta.rkt")
-;(require "tda_archivo.rkt")
-;(require "tda_drive.rkt")
+(require "tda_system_21168603_OyanedelAlvarez.rkt")
+(require "tda_user_21168603_OyanedelAlvarez.rkt")
+(require "tda_folder_21168603_OyanedelAlvarez.rkt")
+(require "tda_file_21168603_OyanedelAlvarez.rkt")
+(require "tda_drive_21168603_OyanedelAlvarez.rkt")
 
 ;este archivo será el main con todas las funciones obligatorias, despues procederé a
 ;distribuir los tda a su tda correspondiente
@@ -27,6 +27,7 @@ RECURSION: no.
 #|FUNCION 2 RUN
 DOMINIO: System X Command (funcion =command)
 RECORRIDO: system
+RECURSION: no
 DESCRIPCION: Función que permite ejecutar un comando (función)
 sobre un sistema. Toda acción realizada con run relativa a creación de archivos,
 carpetas, renombrar, copiar, mover, eliminar, debe dejar un registro de la fecha de
@@ -46,7 +47,7 @@ RECURSION: no
 (define add-drive
   (lambda(system)
     (lambda (letter name capacity);info del drive
-      (if(and (member letter (map car(get-system-drive system)))(integer? capacity)(is-string name))
+      (if(and (member letter (map car(get-system-drive system))))
          (make-system(get-system-name system) ;lo mantiene
                      (get-system-drive system) 
                      (get-system-usuarios system)
@@ -54,13 +55,21 @@ RECURSION: no
                      (get-system-drive-seleccionado system)
                      (get-system-ruta system))
          
-         (make-system (get-system-name system)
-                      (cons(make-drive letter name capacity) ;;make-drive= lista que recibe 3 cosas, y le agrega algo adelante de 3 cosas
-                           (get-system-drive system)) ;cadr de la lista system, system =lista
-                      (get-system-usuarios system)
-                      (get-system-usuario-conectado system)
-                      (get-system-drive-seleccionado system)
-                      (get-system-ruta system))))))
+         (if (and (integer? capacity)(is-string name) (is-char letter) (not(member letter (map car(get-system-drive system)))))
+             (make-system (get-system-name system)
+                          (cons(make-drive letter name capacity) ;;make-drive= lista que recibe 3 cosas, y le agrega algo adelante de 3 cosas
+                               (get-system-drive system)) ;cadr de la lista system, system =lista
+                          (get-system-usuarios system)
+                          (get-system-usuario-conectado system)
+                          (get-system-drive-seleccionado system)
+                          (get-system-ruta system))
+         
+             (make-system(get-system-name system) ;lo mantiene
+                         (get-system-drive system) 
+                         (get-system-usuarios system)
+                         (get-system-usuario-conectado system)
+                         (get-system-drive-seleccionado system)
+                         (get-system-ruta system)))))))
 
 #|FUNCION 4  SWITCH DRIVE
 DOMINIO:system X letter (char)
@@ -86,7 +95,7 @@ RECURSION: no|#
                       
                       (cons(make-carpeta (string-downcase(string-append (string letter)":/"))
                                          '()
-                                         (car(get-system-usuario-conectado system))
+                                         (get-system-usuario-conectado system)
                                          '()
                                          '()) (get-system-ruta system)))
          
@@ -112,7 +121,7 @@ sistema. El nombre de usuario es único y no puede ser duplicado.
 (define register
   (lambda(system)
     (lambda (string)
-      (if(member string (map get-usuarios(get-system-usuarios system))) ;buen
+      (if(and(member string (map car(get-system-usuarios system)))(is-string string)) ;buen
          (make-system(get-system-name system)
                      (get-system-drive system)
                      (get-system-usuarios system)
@@ -136,12 +145,12 @@ DESCRIPCION: Función que permite iniciar sesión con un usuario del sistema, so
 (define login
   (lambda(system)
     (lambda (string)
-      (if (null? (get-system-usuario-conectado system))
-          (if (comprobar string system);verdadero
+      (if (and (null? (get-system-usuario-conectado system))(is-string string))
+          (if (is-member string system);verdadero
               (make-system(get-system-name system);verdadero
                           (get-system-drive system)
                           (get-system-usuarios system)
-                          (cons(status-user string)(get-system-usuario-conectado system))
+                          (cons(is-status-user string)(get-system-usuario-conectado system))
                           (get-system-drive-seleccionado system)
                           (get-system-ruta system))
               
@@ -200,7 +209,7 @@ modificación y atributos de seguridad como los señalados en el enunciado gener
                      (get-system-drive-seleccionado system)
                      (cons(make-carpeta (string-downcase(get-posicion system))
                                         nombre
-                                        (car(get-system-usuario-conectado system))
+                                        (get-system-usuario-conectado system)
                                         '()
                                         '()) (get-system-ruta system)))
          
@@ -232,10 +241,10 @@ la unidad respectivamente.|#
                          (get-system-usuarios system)
                          (get-system-usuario-conectado system)
                          (get-system-drive-seleccionado system)
-                         (cons(make-carpeta (string-downcase(string-append (car(recuperar-ruta system)) path "/"))
+                         (cons(make-carpeta (string-downcase(string-append (car(get-recuperar-ruta system)) path "/"))
                                             null
-                                            (car(get-system-usuario-conectado system))
-                                            (rec-archivos path system)
+                                            (get-system-usuario-conectado system)
+                                            (get-rec-archivos path system)
                                             '())
                               (get-system-ruta system)))
              
@@ -247,8 +256,8 @@ la unidad respectivamente.|#
                              (get-system-drive-seleccionado system)
                              (cons(make-carpeta (string-downcase(string-append(string-join(reverse(cdr(reverse(string-split (get-posicion system) "/"))))"/")"/"))
                                                 null
-                                                (car(get-system-usuario-conectado system))
-                                                (rec-archivos path system)
+                                                (get-system-usuario-conectado system)
+                                                (get-rec-archivos path system)
                                                 '())
                                   (get-system-ruta system)))
                     
@@ -260,8 +269,8 @@ la unidad respectivamente.|#
                                 (get-system-drive-seleccionado system)
                                 (cons(make-carpeta (substring (car(car(get-system-ruta system))) 0 3)
                                                    null
-                                                   (car(get-system-usuario-conectado system))
-                                                   (rec-archivos path system)
+                                                   (get-system-usuario-conectado system)
+                                                   (get-rec-archivos path system)
                                                    '())
                                      (get-system-ruta system)))
 
@@ -273,8 +282,8 @@ la unidad respectivamente.|#
                                    (string->list(string-upcase(string(car(string->list(car(string-split path "/")))))))
                                    (cons(make-carpeta (string-downcase path)
                                                       null
-                                                      (car(get-system-usuario-conectado system))
-                                                      (rec-archivos path system)
+                                                      (get-system-usuario-conectado system)
+                                                      (get-rec-archivos path system)
                                                       '()) ;AQUI ARCHIVOS
                               (get-system-ruta system)))
 
@@ -310,7 +319,7 @@ DESCRIPCION:función que permite añadir un archivo en la ruta actual.
                       (get-system-drive-seleccionado system)
                       (cons(make-carpeta (string-downcase(get-posicion system))
                                          (car(reverse(string-split(get-posicion system)"/"))) ;DUEÑO
-                                         (car(get-system-usuario-conectado system))
+                                         (get-system-usuario-conectado system)
                                          (cons file (get-files system))
                                          '())           
                            (get-system-ruta system)))
@@ -344,8 +353,8 @@ El contenido eliminado se va a la papelera.
                          (get-system-drive-seleccionado system)
                          (cons(make-carpeta (string-downcase(get-posicion system))
                                             (string-downcase(car(reverse(string-split(get-posicion system)"/"))))
-                                            (car(get-system-usuario-conectado system))
-                                            (remove-extension (car (string-split (car(string-split filename "*")) ".")) system)
+                                            (get-system-usuario-conectado system)
+                                            (get-remove-extension (car (string-split (car(string-split filename "*")) ".")) system)
                                             '())           
                               (get-system-ruta system)))
              
@@ -358,8 +367,8 @@ El contenido eliminado se va a la papelera.
                              (get-system-drive-seleccionado system)
                              (cons(make-carpeta (string-downcase(get-posicion system))
                                                 (string-downcase(car(reverse(string-split(get-posicion system)"/"))))
-                                                (car(get-system-usuario-conectado system))
-                                                (letter-titles filename system)
+                                                (get-system-usuario-conectado system)
+                                                (get-letter-titles filename system)
                                                 '())           
                                   (get-system-ruta system)))
                  
@@ -371,7 +380,7 @@ El contenido eliminado se va a la papelera.
                                  (get-system-drive-seleccionado system)
                                  (cons(make-carpeta (string-downcase(get-posicion system))
                                                     (car(reverse(string-split(get-posicion system)"/")))
-                                                    (car(get-system-usuario-conectado system))
+                                                    (get-system-usuario-conectado system)
                                                     (remove-titulo filename system)
                                                     '())           
                                       (get-system-ruta system)))
@@ -382,7 +391,7 @@ El contenido eliminado se va a la papelera.
                                      (get-system-usuarios system)
                                      (get-system-usuario-conectado system)
                                      (get-system-drive-seleccionado system)
-                                     (remove-posicion filename system))
+                                     (get-remove-posicion filename system))
                          
                          (if(equal? "*.*" filename) ;borra todos los archivos DOC TXT
                             (make-system(get-system-name system)
@@ -392,7 +401,7 @@ El contenido eliminado se va a la papelera.
                                         (get-system-drive-seleccionado system)
                                         (cons(make-carpeta (get-posicion system)
                                                            (car(reverse(string-split(get-posicion system)"/")))
-                                                           (car(get-system-usuario-conectado system))
+                                                           (get-system-usuario-conectado system)
                                                            '()
                                                            '())           
                                              (get-system-ruta system)))
@@ -414,7 +423,7 @@ El contenido eliminado se va a la papelera.
 #|FUNCION 12 rd
 DOMINIO:system X folderName or folderPath (string)
 RECORRIDO: system
-RECURSION: no obigatoria asi que no
+RECURSION: no
 DESCRIPCION:  función para eliminar una carpeta, siempre y cuando ésta esté vacía.
 Una carpeta se puede eliminar estando posicionado fuera de ésta.|#
 
@@ -422,7 +431,7 @@ Una carpeta se puede eliminar estando posicionado fuera de ésta.|#
   (lambda (system)
     (lambda(foldername)
       (if (and(is-string foldername)(member foldername (map cadr (get-system-ruta system))) (not(null? (get-system-usuario-conectado system))))
-          (if(not(null? (rec-archivos foldername system))) ;si es vacia la union del dueño y los archivos no se hace nada
+          (if(not(null? (get-rec-archivos foldername system))) ;si es vacia la union del dueño y los archivos no se hace nada
              (make-system(get-system-name system)
                          (get-system-drive system) ;si no es vacia la ultima version, lo mantiene
                          (get-system-usuarios system)
@@ -435,7 +444,7 @@ Una carpeta se puede eliminar estando posicionado fuera de ésta.|#
                              (get-system-usuarios system)
                              (get-system-usuario-conectado system)
                              (get-system-drive-seleccionado system)
-                             (remove-posicion foldername system)))
+                             (get-remove-posicion foldername system)))
           
           (make-system(get-system-name system) ;en caso contrario solo lo mantiene
                       (get-system-drive system) 
@@ -447,15 +456,15 @@ Una carpeta se puede eliminar estando posicionado fuera de ésta.|#
 #|FUNCION 13 copy
 DOMINIO: system X source (file or folder) (String) x target path (String)
 RECORRIDO: system
-RECURSION: NOC
+RECURSION: NO
 DESCRIPCION:función para copiar un archivo o carpeta desde una ruta origen a una ruta destino.|#
 
 (define copy ; no debe eliminar los archivos
   (lambda(system)
     (lambda(source target)
-      ;AGREGAR QUE SE PUEDE HACER SOLO SI LA ULTIMA POSICION DE LOS ARCHIVOS NO SEA VACIA
+      ;AGREGAR QUE SE PUEDE HACER SOLO SI LA ULTIMA POSICION DE LOS ARCHIVOS NO SEA VACIA ;problema con get-files
       (if(and(is-string source)(is-string target)(not(null? (get-system-usuario-conectado system))))    ;si es miembro el ultimo elemento del path en las carpetas creadas y existe el archivo en los archivos
-         (if (and(member(car(reverse(string-split target "/"))) (map cadr (get-system-ruta system))) (member source (map car(get-files system))))
+         (if (and(member(car(reverse(string-split target "/"))) (map cadr (get-system-ruta system))) (member source (map car(map car (get-remove-nulos-archivos system)))))
              (make-system(get-system-name system)
                          (get-system-drive system)
                          (get-system-usuarios system)
@@ -463,8 +472,8 @@ DESCRIPCION:función para copiar un archivo o carpeta desde una ruta origen a un
                          (get-system-drive-seleccionado system)
                          (cons(make-carpeta (string-downcase target) 
                                             (car(reverse(string-split target "/")))
-                                            (car(get-system-usuario-conectado system))
-                                            (no-remove-archivo source system)
+                                            (get-system-usuario-conectado system)
+                                            (get-no-remove-archivo source system)
                                             '())     ;EL ARCHIVO DEBE IR CON TODAS SUS PROPIEDADES       
                               (get-system-ruta system)))
              
@@ -476,8 +485,8 @@ DESCRIPCION:función para copiar un archivo o carpeta desde una ruta origen a un
                              (get-system-drive-seleccionado system)
                              (cons(make-carpeta (string-downcase(string-append target source "/")) 
                                                 source ;DUEÑO DE FOLDER1, O LO QUE ENTRE
-                                                (car(get-system-usuario-conectado system))
-                                                (rec-archivos source system)
+                                                (get-system-usuario-conectado system)
+                                                (get-rec-archivos source system)
                                                 '())      ;EL ARCHIVO DEBE IR CON TODAS SUS PROPIEDADES       
                                                 (get-system-ruta system)))
                  
@@ -516,11 +525,11 @@ La operación de mover elimina el contenido desde la ruta origen.|#
                         (get-system-drive-seleccionado system)
                         (cons(make-carpeta (string-downcase(string-append target source "/"))
                                            source ;DUEÑO DE FOLDER1, O LO QUE ENTRE
-                                           (car(get-system-usuario-conectado system))
-                                           (rec-archivos source system)
+                                           (get-system-usuario-conectado system)
+                                           (get-rec-archivos source system)
                                            '())      ;EL ARCHIVO DEBE IR CON TODAS SUS PROPIEDADES       
-                             (remove-carpeta-drive source target system)))
-            
+                             (get-remove-carpeta-drive source target system)))
+            ;caso de archivo
          (if(and(member (car(reverse(string-split (string-downcase target) "/"))) (map cadr (get-system-ruta system))) (member (string-downcase target) (map car (get-system-ruta system))))
 
             (make-system(get-system-name system)
@@ -530,10 +539,10 @@ La operación de mover elimina el contenido desde la ruta origen.|#
                         (get-system-drive-seleccionado system)
                         (cons(make-carpeta (string-downcase target)
                                            (car(reverse(string-split target "/"))) ;DUEÑO DE FOLDER1, O LO QUE ENTRE
-                                           (car(get-system-usuario-conectado system))
-                                           (append(rec-archivos (car(reverse(string-split target "/"))) system) (no-remove-archivo source system))
+                                           (get-system-usuario-conectado system)
+                                           (append(get-rec-archivos (car(reverse(string-split target "/"))) system) (get-no-remove-archivo source system))
                                            '()) ;EL ARCHIVO DEBE IR CON TODAS SUS PROPIEDADES       
-                             (eliminar_archivo system source)))
+                             (set-eliminar_archivo system source)))
              
              (make-system(get-system-name system) ;en caso contrario solo lo mantiene
                          (get-system-drive system) 
@@ -565,17 +574,17 @@ siempre y cuando el nuevo nombre no viole la restricción de unicidad dentro del
          ;solo tomare en cuenta si existe en la ultima actualizacion de archivos
          ;si existe el nombre en los archivos y si no existe el nuevo nombre en los archivos(tratando de evitar las duplicas)
 ;Caso nombre archivos
-         (if (and (member name (map car(caddr(recuperar-ruta system))))
-                  (not(member new-name (map car(caddr(recuperar-ruta system))))))
+         (if (and (member name (map car(caddr(get-recuperar-ruta system))))
+                  (not(member new-name (map car(caddr(get-recuperar-ruta system))))))
              (make-system(get-system-name system)
                          (get-system-drive system)
                          (get-system-usuarios system)
-                         (car(get-system-usuario-conectado system))
+                         (get-system-usuario-conectado system)
                          (get-system-drive-seleccionado system)
-                         (cons(make-carpeta (string-downcase(car(recuperar-ruta system)))
-                                                    (car(reverse(string-split (car(recuperar-ruta system)) "/")))
+                         (cons(make-carpeta (string-downcase(car(get-recuperar-ruta system)))
+                                                    (car(reverse(string-split (car(get-recuperar-ruta system)) "/")))
                                                     (get-system-usuario-conectado system)
-                                                    (cambia-nombre-archivo system name new-name)
+                                                    (set-cambia-nombre-archivo system name new-name)
                                                     '())           
                                             (get-system-ruta system)))
              
@@ -591,8 +600,8 @@ siempre y cuando el nuevo nombre no viole la restricción de unicidad dentro del
                          (get-system-drive-seleccionado system)
                          (cons(make-carpeta (string-downcase(string-append(string-append (get-posicion system) new-name)"/")) 
                                             new-name
-                                            (car(get-system-usuario-conectado system))
-                                            (rec-archivos name system)
+                                            (get-system-usuario-conectado system)
+                                            (get-rec-archivos name system)
                                             '())           
                               (get-system-ruta system)))
              
@@ -649,11 +658,12 @@ además de indicar nuevo nombre, pero conservando capacidad.
                      (get-system-usuario-conectado system)
                      (get-system-drive-seleccionado system)
                      (get-system-ruta system))))))
+
 #|TDA FUNCION 18 ENCRYPT
 DOMINIO:system X
         encryptFn (fn: String->String) X decryptFn (fn: String->String) password (String) X folderName or Path (String)
 RECORRIDO: system
-RECURSION: 
+RECURSION: Si, en las partes que hace la encriptacion en sí, usa de cola
 DESCRIPCION: función para encriptar un archivo o carpeta y todo su contenido
 (nombres de carpetas, subcarpetas, archivos y el contenido de éstos).
 La función de encriptación está dada por una función String->String.
@@ -671,8 +681,8 @@ en la metadata de la carpeta y su contenido, para una posterior desencriptación
                           (get-system-drive-seleccionado system)
                           (cons(make-carpeta (get-posicion system)
                                              (plus-one (get-carpetas system)) ;NOMBRE ENCRIPTADO
-                                             (car(get-system-usuario-conectado system))
-                                             (encriptar system path)
+                                             (get-system-usuario-conectado system)
+                                             (set-encriptar system path plus-one)
                                              password)           
                                (get-system-ruta system)))
               
@@ -683,9 +693,9 @@ en la metadata de la carpeta y su contenido, para una posterior desencriptación
                              (get-system-usuario-conectado system)
                              (get-system-drive-seleccionado system)
                              (cons(make-carpeta (get-posicion system)
-                                                (car(reverse(string-split (car(recuperar-ruta system)) "/")))
-                                                (car(get-system-usuario-conectado system))
-                                                (encriptar-t system path)
+                                                (car(reverse(string-split (car(get-recuperar-ruta system)) "/")))
+                                                (get-system-usuario-conectado system)
+                                                (set-encriptar-t system path plus-one)
                                                 password)           
                                   (get-system-ruta system)))
                  
@@ -706,12 +716,12 @@ en la metadata de la carpeta y su contenido, para una posterior desencriptación
 #|TDA FUNCION 19 DECRYPT
 DOMINIO: system X  password (String) X folderName or Path (String)
 RECORRIDO: system
-RECURSION:
+RECURSION: Si, de cola
 DESCRIPCION: función para desencriptar un archivo o carpeta y todo su contenido
 (nombres de carpetas, subcarpetas, archivos y el contenido de éstos)..
 |#
 (define decrypt
-  (lambda (system)
+  (lambda (system) ;carpeta-archivo
     (lambda (password path)
       (if (and(is-string password) (not(null?(get-system-usuario-conectado system)))) ;CASO archivo
           (if (and(equal? password (get-password system)) (member (string-append(plus-one(car(string-split path ".")))"."(car(cdr(string-split path ".")))) (map car (get-files system)))) 
@@ -722,12 +732,12 @@ DESCRIPCION: función para desencriptar un archivo o carpeta y todo su contenido
                           (get-system-drive-seleccionado system)
                           (cons(make-carpeta (get-posicion system)
                                              (get-carpetas system) 
-                                             (car(get-system-usuario-conectado system))
-                                             (desencriptar-t system path)
+                                             (get-system-usuario-conectado system)
+                                             (set-desencriptar-t system path plus-one minus-one)
                                              '())           
                                (get-system-ruta system)))
               ;caso carpetas  
-              (if (and(equal? password (caddr (cdr(cdr(cadr(recuperar-listas system))))))  (member(plus-one path) (map cadr (get-system-ruta system))))
+              (if (and(equal? password (caddr (cdr(cdr(cadr(get-recuperar-listas system))))))  (member(plus-one path) (map cadr (get-system-ruta system))))
                   (make-system(get-system-name system)
                               (get-system-drive system)
                               (get-system-usuarios system)
@@ -735,8 +745,8 @@ DESCRIPCION: función para desencriptar un archivo o carpeta y todo su contenido
                               (get-system-drive-seleccionado system)
                               (cons(make-carpeta (string-downcase(string-append(get-posicion system)(minus-one (plus-one path))"/"))
                                                  (string-downcase(minus-one (plus-one path))) ;NOMBRE ENCRIPTADO
-                                                 (car(get-system-usuario-conectado system))
-                                                 (desencriptar system path)
+                                                 (get-system-usuario-conectado system)
+                                                 (set-desencriptar system path plus-one minus-one)
                                                  '())           
                                    (get-system-ruta system)))
                   
@@ -757,7 +767,7 @@ DESCRIPCION: función para desencriptar un archivo o carpeta y todo su contenido
 #|TDA FUNCION 20 PLUS-ONE
 DOMINIO: String
 RECORRIDO: String
-RECURSION: prob
+RECURSION: no
 DESCRIPCION: función que transforma un String sumando al código ASCII
 de cada carácter un 1. Está función se puede usar en combinación con la función encrypt.|#
 (define plus-one
@@ -771,7 +781,7 @@ de cada carácter un 1. Está función se puede usar en combinación con la func
 #|TDA FUNCION 21 MINUS-ONE
 DOMINIO: String
 RECORRIDO: String
-RECURSION: prob
+RECURSION: no
 DESCRIPCION: función que transforma un String restando al código ASCII de
 cada carácter un 1. Está función se puede usar en combinación con la función encrypt.|#
 (define minus-one
@@ -782,6 +792,31 @@ cada carácter un 1. Está función se puede usar en combinación con la funció
 
 
 
+;creando un sistema
+(define S0 (system "newSystem"))
+
+;añadiendo unidades. Incluye caso S2 que intenta añadir unidad con una letra que ya existe
+(define S1 ((run S0 add-drive) #\C "SO" 1000))
+(define S2 ((run S1 add-drive) #\C "SO1" 3000))
+(define S3 ((run S2 add-drive) #\D "Util" 2000))
+
+;añadiendo usuarios. Incluye caso S6 que intenta registrar usuario duplicado
+(define S4 ((run S3 register) "user1"))
+(define S5 ((run S4 register) "user1"))
+(define S6 ((run S5 register) "user2"))
+
+
+;iniciando sesión con usuarios. Incluye caso S8 que intenta iniciar sesión con user2 sin antes haber salido con user1
+(define S7 ((run S6 login) "user1"))
+(define S8 ((run S7 login) "user2"))
+
+;cerrando sesión user1 e iniciando con user2
+(define S9 (run S8 logout))
+(define S10 ((run S9 login) "user2"))
+
+;cambios de unidad, incluyendo unidad inexistente K
+(define S11 ((run S10 switch-drive) #\K)) ;no existe este drive 
+(define S12 ((run S11 switch-drive) #\C))
 
 ;añadiendo carpetas. Incluye casos de carpetas duplicadas.
 (define S13 ((run S12 md) "folder1"))
@@ -851,7 +886,7 @@ cada carácter un 1. Está función se puede usar en combinación con la funció
 
 
 ;copiando carpetas y archivos
-(define S46 ((run S35 copy) "foo1.txt" "C:/folder3/"))
+(define S46 ((run S35 copy) "foo1.txt" "C:/folder3/")) ;funciona por coincidencia
 (define S47 ((run S46 cd) ".."))
 (define S48 ((run S47 copy) "folder1" "D:/"))
 
@@ -868,10 +903,23 @@ cada carácter un 1. Está función se puede usar en combinación con la funció
 
 
 (define S56 ((run S55 encrypt) plus-one minus-one "1234" "newFolder1")) ;cambiar lo que hay dentro de la carpeta
+
+;listando la información
+(display ((run S16 dir)"")) ;aqui le coloque comillas para que corra
+(newline)
+(display ((run S55 dir)"")) ;aqui le coloque comillas para que corra
+(newline)
+(display ((run S55 dir) "/s")) ;muestra carpetas y subcarpetas de la unidad C
+(newline)
+(display ((run S55 dir) "/s /a")) ;muestra todo el contenido de carpetas y subcarpetas de la unidad C incluyendo archivo oculto goo4.docx
+
+;(display ((run S16 dir) ""))
+;(newline)
+;(display ((run S55 dir)"/s"))
+
 (define S57 ((run S56 switch-drive) #\D))
 (define S58 ((run S57 cd) "folder3"))
 (define S59 ((run S58 encrypt) plus-one minus-one "4321" "foo3.docx"))
-
 
 
 ;desencriptando archivos y carpetas

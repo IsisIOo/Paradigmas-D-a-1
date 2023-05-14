@@ -11,7 +11,7 @@
 ;Profesor:Gonzalo Martínez
 ;Laboratorio n1 Paradigmas de programación
 
-#|Funcion 1 System - constructor
+#|Funcion 1 SYSTEM-CONSTRUCTOR
 DOMINIO: string
 RECORRIDO: system (conformado por nombre sistema, drive y usuario/s)
 DESCRIPCION: se ingresa un string en la funcion devolviendo un system
@@ -71,7 +71,7 @@ RECURSION: no
                          (get-system-drive-seleccionado system)
                          (get-system-ruta system)))))))
 
-#|FUNCION 4  SWITCH DRIVE
+#|FUNCION 4  SWITCH-DRIVE
 DOMINIO:system X letter (char)
 RECORRIDO: system
 DESCRIPCION: Permite fijar la unidad en la que el usuario
@@ -190,7 +190,8 @@ DESCRIPCION: Función que permite cerrar la sesión de un usuario en el sistema.
                   (get-system-usuario-conectado system)
                   (get-system-drive-seleccionado system)
                   (get-system-ruta system))))
-#|FUNCION 8 md
+
+#|FUNCION 8 MD
 DOMINIO: system X name (String) 
 RECORRIDO: SYSTEM
 RECURSION: no 
@@ -302,7 +303,7 @@ la unidad respectivamente.|#
                       (get-system-ruta system))))))
 
 
-#|FUNCION 10  TDA system - add-file
+#|FUNCION 10 ADD-FILE
 DOMINIO:system X file
 RECORRIDO: system
 RECURSION: NO
@@ -331,7 +332,7 @@ DESCRIPCION:función que permite añadir un archivo en la ruta actual.
                       (get-system-drive-seleccionado system)
                       (get-system-ruta system))))))
 
-#|TDA FUNCION 11 DEL
+#|FUNCION 11 DEL
 DOMINIO:system X fileName or fileNamePattern (string)
 RECORRIDO: system
 RECURSION: NO
@@ -420,7 +421,7 @@ El contenido eliminado se va a la papelera.
                      (get-system-drive-seleccionado system)
                      (get-system-ruta system))))))
 
-#|FUNCION 12 rd
+#|FUNCION 12 RD
 DOMINIO:system X folderName or folderPath (string)
 RECORRIDO: system
 RECURSION: no
@@ -453,7 +454,7 @@ Una carpeta se puede eliminar estando posicionado fuera de ésta.|#
                       (get-system-drive-seleccionado system)
                       (get-system-ruta system))))))
 
-#|FUNCION 13 copy
+#|FUNCION 13 COPY
 DOMINIO: system X source (file or folder) (String) x target path (String)
 RECORRIDO: system
 RECURSION: NO
@@ -659,7 +660,7 @@ además de indicar nuevo nombre, pero conservando capacidad.
                      (get-system-drive-seleccionado system)
                      (get-system-ruta system))))))
 
-#|TDA FUNCION 18 ENCRYPT
+#|FUNCION 18 ENCRYPT
 DOMINIO:system X
         encryptFn (fn: String->String) X decryptFn (fn: String->String) password (String) X folderName or Path (String)
 RECORRIDO: system
@@ -669,6 +670,7 @@ DESCRIPCION: función para encriptar un archivo o carpeta y todo su contenido
 La función de encriptación está dada por una función String->String.
 La función de desencriptación (decryptFn) quedará registrada
 en la metadata de la carpeta y su contenido, para una posterior desencriptación.|#
+
 (define encrypt
   (lambda (system)
     (lambda (encryptFn decryptFn password path)
@@ -713,7 +715,7 @@ en la metadata de la carpeta y su contenido, para una posterior desencriptación
                       (get-system-drive-seleccionado system)
                       (get-system-ruta system))))))
 
-#|TDA FUNCION 19 DECRYPT
+#|FUNCION 19 DECRYPT
 DOMINIO: system X  password (String) X folderName or Path (String)
 RECORRIDO: system
 RECURSION: Si, de cola
@@ -764,7 +766,7 @@ DESCRIPCION: función para desencriptar un archivo o carpeta y todo su contenido
                       (get-system-drive-seleccionado system)
                       (get-system-ruta system))))))
 
-#|TDA FUNCION 20 PLUS-ONE
+#|FUNCION 20 PLUS-ONE
 DOMINIO: String
 RECORRIDO: String
 RECURSION: no
@@ -778,7 +780,7 @@ de cada carácter un 1. Está función se puede usar en combinación con la func
        
 
 
-#|TDA FUNCION 21 MINUS-ONE
+#|FUNCION 21 MINUS-ONE
 DOMINIO: String
 RECORRIDO: String
 RECURSION: no
@@ -789,6 +791,29 @@ cada carácter un 1. Está función se puede usar en combinación con la funció
     (if (is-string string)
         (list->string(map integer->char(map (lambda (x) (- x 1)) (map char->integer (string->list string)))))
         #f)))
+
+
+#|FUNCION 22 GREP
+DOMINIO: system X pattern (String) X fileName or path (String)
+RECORRIDO: String formateado para visualizarlo con display
+RECURSION: -
+DESCRIPCION: Función que permite buscar dentro del contenido de un archivo específico o dentro de una ruta.|#
+
+
+#|FUNCION 23 VIEW-TRASH
+DOMINIO: system
+RECORRIDO: String formateado para visualizarlo con display
+RECURSION: -
+DESCRIPCION: función que permite obtener el contenido de la papelera de reciclaje de un sistema.|#
+
+
+#|FUNCION 24 RESTORE
+DOMINIO: system
+         fileName or pattern (String)
+RECORRIDO: String formateado para visualizarlo con display
+RECURSION: -
+DESCRIPCION: función que restaurar contenido específico dentro de la papelera para ubicarlo en su ubicación original.|#
+
 
 
 
@@ -927,3 +952,18 @@ cada carácter un 1. Está función se puede usar en combinación con la funció
 (define S61 ((run S60 decrypt) "4321" "foo3.docx"))
 (define S62 ((run S61 switch-drive) #\C))
 (define S63 ((run S62 decrypt) "1234" "newFolder1"))
+
+
+
+;FUNCIONES NO HECHAS
+
+;;buscando contenido
+;(define S64 ((run S63 cd) "newFolder1"))
+;(display ((run S64 grep) "hello" "newFoo1.txt"))
+;(display ((run S64 grep) "hello" "*.*"))
+
+;viendo la papelera
+;(display (run S45 viewTrash))
+
+;restaurando
+;(define S65 ((run S45 restore) "folder1"))
