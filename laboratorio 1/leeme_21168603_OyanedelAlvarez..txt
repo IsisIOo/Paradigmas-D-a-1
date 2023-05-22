@@ -1,0 +1,42 @@
+Para encontrar el trabajo hay que entrar en la carpeta "laboratorio 1" del git, no supe hacer mas ordenado las cosas que subia o los archivos extras que hay, temia que se borrara algo y preferí hacer la carpeta. Lo que hay en la carpeta es el archivo final, lo que no esté dentro son versiones no terminadas o que no cumplen los requerimientos como el titulo del archivo o los titulos de las funciones segun la capa, entre otros.
+
+En el archivo llamado "archivo de pruebas" al final se encuentran los script creados por mi para poder probar el programa, no quise hacerlo junto con el main porque se iba a confundir. El codigo en ese archivo es el mismo que en el main, para evitar problemas con que lo cambie para que funcionara, es un copia y pega del main por si lo quieren comprobar.
+
+Desde la función md el codigo funciona con un stack, esta decision fue tomada porque de esa forma podia ver de forma de historial los cambios que se producian en el sistema, y podia comprobar si funcionaban los cambios que producian las funciones.
+A causa de eso, el estado mas actual será el que esté mas arriba del stack
+por ejemplo:
+'("newSystem"
+  ((#\D "Util" 2000) (#\C "SO" 1000))
+  (("user2") ("user1"))
+  ("user2")
+  (#\C)
+  (("c:/folder2/folder21/" "folder211" () ("user2") () 1684036957) ------->Estado mas actual
+   ("c:/folder2/folder21/" () () ("user2") () 1684036957)
+   ("c:/folder2/" () () ("user2") () 1684036957)
+   ("c:/folder2/folder21/" () () ("user2") () 1684036957)
+   ("c:/folder2/" "folder21" () ("user2") () 1684036957)
+   ("c:/folder2/" () () ("user2") () 1684036957)
+   ("c:/" "folder3" () ("user2") () 1684036957)
+   ("c:/" "folder2" () ("user2") () 1684036957)
+   ("c:/" "folder1" () ("user2") () 1684036957)
+   ("c:/" () () ("user2") () 1684036957)) -------> Estado mas antiguo
+  1684036957)
+
+Además los cambios desde la parte que dice "newSystem" hasta (#\C) no funciona como stack.
+
+
+La funcion dir solo funciona si la entrada tiene la modificacion de "" en vez de un vacio
+por ejemplo:
+EL ORIGINAL (display ((run S55 dir)))
+lA QUE FUNCIONA EN MI CODIGO (display ((run S55 dir)""))
+Esto solo ocurre en la entrada vacía, y agregar que la entrada vacía no entrega el resultado esperado.
+Añadir que las comillas no tienen espacio entre ellas.
+
+
+La funcion move, especificamente en el caso de mover un archivo a otro lugar, funciona solo en condiciones especificas, por ejemplo funciona como deberia con el script de los profesores, pero en el script de prueba no funciona correctamente, se equivoca de drive. Es un problema que no supe resolver, por lo tanto no funciona el 100% de las veces.
+
+
+La funcion encrypt solo funciona para encriptar una sola vez, es decir, solo puede encriptar un archivo/carpeta 1 vez, porque si lo hace por segunda vez (por la forma en que hice la funcion) encuentra la carpeta y encripta el nombre pero los archivos no lo hace porque no cumple la condicion que coloqué en la recursión.
+
+Fuera de esto, el resto del codigo (hasta donde se llegó) entrega los resultados esperados de acuerdo a los srcipts.
+

@@ -1,0 +1,44 @@
+Autoevaluación:
+
+Requerimientos funcionales:		Puntaje
+
+Autoevaluación.				1
+Lenguaje:				1
+Versión:				1
+Standart:				1
+No variables:				1
+Documentación:				1
+Dom->Rec:				1
+Organización:				1
+Historial:				1
+Script de pruebas:			1
+Prerrequesitos:				1
+
+
+Requerimiento funcional: 		Puntaje
+
+TDA's: 					1
+system: 				1
+run:  					1
+add-drive: 				1
+Register: 				1
+login: 					1
+logout: 				1
+switch-drive: 				1
+md (make directory): 			1
+cd (change directory): 			1
+add-file:  				1
+del: 					1
+rd (remove directory): 			1 
+copy: 					1
+move: 					0.75 (incorrecta eliminacion en caso de mover archivo)
+ren (rename): 				1
+dir (directory): 			0.75 (incorrecta solucion en entrada vacia)
+format: 				1
+encrypt: 				1
+decrypt: 				1
+minus-one				1
+plus-one				1
+grep:					0
+view-trash:				0
+restore:				0
